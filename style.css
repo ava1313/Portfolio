@@ -89,11 +89,13 @@ body {
 /* Media query for devices with a maximum width of 991px */
 @media (max-width: 991px) {
     .navbar {
+        margin-top: 0px !important;
         display: flex; /* Use flexbox to align children inline */
         justify-content: space-between; /* Space out brand and toggler to opposite ends */
         width: 100%; /* Make the navbar full width */
         border-radius: 0; /* Remove border-radius */
         padding: 0.5rem 1rem; /* Adjust padding for alignment */
+        
     }
 
     .navbar-header {
