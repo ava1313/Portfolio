@@ -8,6 +8,7 @@
     <title>My Portfolio</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
+    
     <script src="https://kit.fontawesome.com/59bc267a29.js" crossorigin="anonymous"></script>  
 </head>
 <body>
@@ -16,9 +17,11 @@
         <div class="container">
             <div class="navbar-header">
                 <a class="navbar-brand" href="#">Stratis Avagianos</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <!-- Burger icon with toggle for popup on small screens -->
+                <button class="navbar-toggler" type="button" id="toggleMenu">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+                
             </div>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ml-auto">
@@ -44,6 +47,33 @@
             </div>
         </div>
     </nav>
+    
+    <!-- Popup Menu for smaller screens -->
+    <!-- Popup Menu for smaller screens -->
+<div id="popupMenu" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #232732; z-index: 1050; color: white;">
+    <div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <button onclick="togglePopup()" style="position: absolute; top: 20px; right: 20px; border: none; background: none; color: white; font-size: 30px; cursor: pointer;">&times;</button>
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="#about" onclick="togglePopup()">About Me</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#projects" onclick="togglePopup()">Projects</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#skills" onclick="togglePopup()">Skills</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#experience" onclick="togglePopup()">Experience</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#contact" onclick="togglePopup()">Contact Me</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+    
     
     
     <!-- Content Area -->

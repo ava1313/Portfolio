@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Poppins', sans-serif;
     background-color: #232732;
@@ -56,7 +60,138 @@ body {
     }
 }
 
+/* Media query for devices between 992px and 1279px width */
+@media (min-width: 992px) and (max-width: 1279px) {
+    .navbar-nav .nav-link {
+        font-size: 14px; /* Smaller font size */
+    }
 
+    .navbar-brand {
+        font-size: 1.3em; /* Slightly reduce the size of the navbar brand */
+    }
+}
+
+
+
+@media (max-width: 991px) {
+    #navbarSupportedContent {
+        display: none;  /* Hide the regular navbar collapse on smaller screens */
+    }
+}
+
+/* Ensure popup menu is hidden initially and controlled by JavaScript */
+#popupMenu {
+    display: none;
+}
+
+
+/* Media query for devices with a maximum width of 991px */
+/* Media query for devices with a maximum width of 991px */
+@media (max-width: 991px) {
+    .navbar {
+        display: flex; /* Use flexbox to align children inline */
+        justify-content: space-between; /* Space out brand and toggler to opposite ends */
+        width: 100%; /* Make the navbar full width */
+        border-radius: 0; /* Remove border-radius */
+        padding: 0.5rem 1rem; /* Adjust padding for alignment */
+    }
+
+    .navbar-header {
+        display: flex;
+        align-items: center; /* Center-align the brand and toggler vertically */
+        width: 100%; /* Allows full width to manage space */
+        justify-content: space-between; /* Places brand and toggler on opposite ends */
+    }
+
+    .navbar-toggler {
+        display: block; /* Ensure the toggle button is visible */
+    }
+
+    .navbar-brand {
+        order: 0; /* Ensures the brand is on the left */
+    }
+
+    #navbarSupportedContent {
+        display: none; /* Initially hide the navigation links */
+        flex-basis: 100%; /* Takes full width to align items correctly when displayed */
+    }
+
+    .navbar-toggler.collapsed + #navbarSupportedContent {
+        display: flex; /* Display as flex to enable the inner flex properties */
+        flex-direction: column; /* Stack the items vertically */
+        align-items: center; /* Center the links vertically when the menu is expanded */
+        width: 100%; /* Full width for alignment */
+    }
+
+    .navbar-nav {
+        width: 100%; /* Ensure the nav takes full width in collapsed mode */
+        justify-content: center; /* Centers the items when expanded */
+        flex-direction: column; /* Makes the nav items stack vertically */
+    }
+}
+#popupMenu {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #232732; /* Dark background for the popup */
+    z-index: 1050;
+    color: white;
+    overflow: hidden;
+    display: flex;
+    align-items: center; /* This will center the content vertically */
+    justify-content: center;
+    text-align: center; /* This will center the content horizontally */
+}
+
+#popupMenu div {
+    width: 100%; /* You can adjust the width if necessary */
+    max-width: 600px; /* Ensuring it doesn't get too wide on larger screens within the popup */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers children vertically within the div */
+    align-items: center; /* Centers children horizontally within the div */
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+#popupMenu .navbar-nav {
+    width: 100%; /* Ensures full width of the container for alignment */
+    list-style: none;
+    padding: 0;
+    margin: 0; /* Removes default margin */
+}
+
+#popupMenu .nav-item {
+    margin: 10px 0; /* Adds vertical spacing between menu items */
+}
+
+#popupMenu .nav-link {
+    color: white;
+    font-size: 20px;
+    text-decoration: none;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#popupMenu .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Subtle hover effect */
+}
+
+/* Style for the close button */
+#popupMenu button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    border: none;
+    background: none;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+}
 
 
 
@@ -195,18 +330,48 @@ body {
     margin-bottom: 30px;
 }
 /* For mobile devices and lower */
-@media (max-width: 767.98px) {
+
+
+/* Media query for devices with a maximum width of 991px */
+@media (max-width: 991.98px) {
+    .row > div {
+        flex: 0 0 100%; /* Each column takes full width of the row */
+        max-width: 100%; /* Each column takes full width of the row */
+    }
+
     .about-image,
     .about-content {
-        width: 100%; /* Set width to 100% for full width on small screens */
-        text-align: center; /* Center align content */
+        width: 100%; /* Ensure both image and content take full width */
+        text-align: center; /* Center align the content for better appearance */
     }
 
     .about-image img {
-        margin-bottom: 20px; /* Add spacing between image and content */
+        margin-bottom: 20px; /* Add some spacing between the image and the text content */
+        display: block; /* Ensure images are block elements */
+        margin-left: auto; /* These two properties */
+        margin-right: auto; /* center the image horizontally */
+        position: relative; /* Override the absolute position on smaller screens */
+        top: auto; /* Neutralize offset from the top */
+        left: auto; /* Neutralize offset from the left */
+    }
+
+    .about-image img:nth-child(2) {
+        position: absolute; /* Keep the second image absolutely positioned for the hover effect */
+        top: 0; /* Align top */
+        left: 50%; /* Start from the middle */
+        transform: translateX(-50%); /* Shift it back by 50% of its own width to truly center it */
+        z-index: -1; /* Keep it behind the first image */
+        opacity: 0; /* Start as invisible */
+    }
+
+    .about-image:hover img:nth-child(1) {
+        opacity: 0;
+    }
+
+    .about-image:hover img:nth-child(2) {
+        opacity: 1;
     }
 }
-
 
 
 /* SKILLS SECTION */
@@ -384,6 +549,13 @@ h2{padding-bottom: 60px;}
     animation-delay: 2.4s;
 }
 
+/* Media query for devices with a maximum width of 991px */
+@media (max-width: 991.98px) {
+    .skills-grid {
+        justify-content: center; /* Horizontally centers the grid items if they don't fill all the horizontal space */
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Ensures the grid items adjust to fill the available space */
+    }
+}
 
 /* Repeat for other skills as needed */
 
@@ -530,7 +702,13 @@ h2{padding-bottom: 60px;}
       }
     }
   
-  
+  /* Media query for devices with a maximum width of 991px */
+@media (max-width: 991.98px) {
+    .cube-container {
+        display: none; /* Hide the cube container on smaller screens */
+    }
+}
+
 
 
 
@@ -589,6 +767,14 @@ h2{padding-bottom: 60px;}
 }
 
 
+/* Media query for devices with a maximum width of 991px */
+@media (max-width: 991.98px) {
+    .row {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr); /* Each card takes full width */
+        gap: 20px; /* Adds 20px of space between grid items */
+    }
+}
 
 
 /* CONTACT */

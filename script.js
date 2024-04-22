@@ -27,3 +27,26 @@ window.addEventListener('scroll', handleScroll);
 
 // Check immediately in case the section is already in view on initial page load
 document.addEventListener('DOMContentLoaded', handleScroll);
+
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    var toggleButton = document.getElementById('toggleMenu');
+    var popupMenu = document.getElementById('popupMenu');
+
+    toggleButton.addEventListener('click', function() {
+        popupMenu.style.display = 'block';
+    });
+
+    document.querySelectorAll('#popupMenu .nav-link').forEach(function(link) {
+        link.addEventListener('click', function() {
+            popupMenu.style.display = 'none';
+        });
+    });
+
+    // This part handles the close button
+    document.querySelector('#popupMenu button').addEventListener('click', function() {
+        popupMenu.style.display = 'none';
+    });
+});
