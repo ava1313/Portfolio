@@ -143,7 +143,7 @@ main {
     display: flex;
     align-items: stretch;
     justify-content: flex-start;
-    padding-top: 12px;     /* gap between top border and images */
+    padding-top: 22px;     /* gap between top border and images */
     box-sizing: border-box;
     margin: 0;
 }
