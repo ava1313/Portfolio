@@ -132,7 +132,7 @@ main {
     flex-shrink: 0;
 }
 
-/* === CAROUSEL CONTAINER (fills remaining space, no gap below) === */
+/* Carousel Container: hides overflow, sets fixed height for desktop */
 .carousel-container {
     width: 100vw;
     background: #fff;
@@ -148,31 +148,44 @@ main {
     margin: 0;
 }
 
+/* Carousel: enables sliding animation */
 .carousel {
     display: flex;
-    width: 100vw;
-    height: 100%;
     align-items: stretch;
+    height: 100%;
+    width: auto;                   /* allow natural width for sliding */
     gap: 0;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    /* Animation for sliding */
+    transition: transform 0.65s cubic-bezier(.33,1.01,.68,1);
+    will-change: transform;
 }
 
+/* Each image: takes 25vw so that 4 images are always visible (100vw) */
 .carousel img {
-    height: 100%;
+    flex: 0 0 25vw;
     width: 25vw;
     min-width: 0;
     object-fit: cover;
+    height: 100%;
     border-radius: 0;
     margin: 0;
     background: #fff;
     border: none;
     display: block;
     box-sizing: border-box;
+    pointer-events: none;
+    user-select: none;
 }
 
-/* === ARROW BUTTON === */
+/* For large screens, you may prefer fixed pixel width (optional) */
+@media (min-width: 1200px) {
+    .carousel img { flex-basis: 300px; width: 300px; }
+}
+
+/* Arrow button styling remains unchanged */
 .carousel-btn {
     background: #000;
     color: #fff;
