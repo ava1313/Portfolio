@@ -46,7 +46,7 @@ header {
 }
 
 .logo {
-    height: 95px;
+    height: 50px;
     object-fit: contain;
     margin: 0;
     display: inline-block;
@@ -125,7 +125,7 @@ main {
 .carousel-border {
     width: 100vw;
     border-top: 5px solid #111;
-    margin-top: 32px;   /* Space between search bar and carousel */
+    margin-top: 87px;   /* Space between search bar and carousel */
     margin-bottom: 0;
     padding: 0;
     background: #fff;
