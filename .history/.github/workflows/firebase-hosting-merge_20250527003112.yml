@@ -1,0 +1,33 @@
+name: Deploy to Firebase Hosting on merge
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies and build
+        run: cd app && npm ci && CI=false npm run build
+
+      - name: Debug: Show current directory and files
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Listing files in root:"
+          ls -la
+          echo "Listing files in app folder:"
+          ls -la app
+
+      - name: Deploy to Firebase Hosting (production)
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_FREEDOME_DFD07 }}
+          projectId: freedome-dfd07
+          entryPoint: app
