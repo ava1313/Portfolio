@@ -15,6 +15,15 @@ jobs:
       - name: Install dependencies and build
         run: cd app && npm ci && CI=false npm run build
 
+      - name: Debug: Show current directory and files
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Listing files in root:"
+          ls -la
+          echo "Listing files in app folder:"
+          ls -la app
+
       - name: Deploy to Firebase Hosting (production)
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
