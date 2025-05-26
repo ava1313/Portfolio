@@ -1,0 +1,2 @@
+AIzaSyCRtwSDCjGfyulFxOGi4cKR3IQf3i-MTHU maps js api
+    googleMapsApiKey: "AIzaSyCRtwSDjGfyulFxOGi4cKR3IQf3i-MTHU", // Your key here

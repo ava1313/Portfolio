@@ -1,0 +1,4 @@
+Combined Next Steps Plan:
+Feature	Next Steps to Implement
+
+5. Social Features	Follow/unfollow, activity feed, sharing, notifications
