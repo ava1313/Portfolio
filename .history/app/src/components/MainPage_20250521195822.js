@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "./Navbar"; // your Navbar component
-import categories from "../data/categories"; // your categories data
+import Navbar from "./Navbar";                    // <-- import Navbar here
+import categories from "../data/categories";
 import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
 import "./style.css";
 
@@ -25,19 +25,10 @@ const flattenCategories = () =>
 export default function MainPage() {
   const navigate = useNavigate();
   const [slideIndex, setSlideIndex] = useState(0);
-
-  // Searchable category states
-  const allCategories = flattenCategories();
-  const [categoryInput, setCategoryInput] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-
-  const filteredCategories = allCategories.filter((cat) =>
-    cat.toLowerCase().includes(categoryInput.toLowerCase())
-  );
-
-  // Location and businessType states
+  const [category, setCategory] = useState("");
   const [location, setLocation] = useState("");
   const [businessType, setBusinessType] = useState("");
+  const allCategories = flattenCategories();
 
   const autocompleteRef = useRef(null);
   const { isLoaded } = useJsApiLoader({
@@ -59,85 +50,46 @@ export default function MainPage() {
 
   const onSearch = () => {
     const params = new URLSearchParams();
-    if (selectedCategory) params.append("category", selectedCategory);
+    if (category) params.append("category", category);
     if (location) params.append("location", location);
     if (businessType) params.append("keyword", businessType);
     navigate(`/results?${params.toString()}`);
   };
 
-  // When user clicks category from dropdown
-  const onCategoryChange = (value) => {
-    setSelectedCategory(value);
-    setCategoryInput(value);
-  };
-
   return (
     <>
-      <Navbar />
+      <Navbar /> {/* <-- Insert Navbar here */}
 
       <main>
         <p className="subtitle">Κάνε την καλύτερη επιλογή για εσένα</p>
 
         <div className="actions" style={{ gap: 20, flexWrap: "wrap" }}>
-          {/* Searchable Category Input */}
-          <div style={{ flex: "1 1 200px", position: "relative" }}>
-            <input
-              type="text"
+          {/* Category dropdown */}
+          <div style={{ flex: "1 1 200px" }}>
+            <select
               aria-label="Αναζήτηση κατηγορίας"
-              placeholder="Επιλέξτε κατηγορία ή πληκτρολογήστε..."
-              value={categoryInput}
-              onChange={(e) => {
-                setCategoryInput(e.target.value);
-                setSelectedCategory(""); // clear selection on typing
-              }}
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
               style={{
                 padding: "14px 20px",
                 borderRadius: "40px",
                 border: "2px solid black",
                 width: "100%",
                 fontSize: 18,
-                cursor: "text",
+                cursor: "pointer",
                 backgroundColor: "white",
+                appearance: "none",
+                WebkitAppearance: "none",
+                MozAppearance: "none",
               }}
-              autoComplete="off"
-            />
-
-            {/* Dropdown with filtered categories */}
-            {categoryInput && filteredCategories.length > 0 && (
-              <ul
-                style={{
-                  position: "absolute",
-                  top: "100%",
-                  left: 0,
-                  right: 0,
-                  maxHeight: 150,
-                  overflowY: "auto",
-                  backgroundColor: "white",
-                  border: "2px solid black",
-                  borderTop: "none",
-                  borderRadius: "0 0 40px 40px",
-                  margin: 0,
-                  padding: 0,
-                  listStyle: "none",
-                  zIndex: 1000,
-                }}
-              >
-                {filteredCategories.map((cat, idx) => (
-                  <li
-                    key={idx}
-                    onClick={() => onCategoryChange(cat)}
-                    style={{
-                      padding: "8px 20px",
-                      cursor: "pointer",
-                      borderBottom: "1px solid #ddd",
-                    }}
-                    onMouseDown={(e) => e.preventDefault()} // prevent input blur on click
-                  >
-                    {cat}
-                  </li>
-                ))}
-              </ul>
-            )}
+            >
+              <option value="">Επιλέξτε κατηγορία</option>
+              {allCategories.map((cat, idx) => (
+                <option key={idx} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Location input with Google autocomplete */}
