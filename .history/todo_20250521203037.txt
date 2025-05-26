@@ -1,7 +1,0 @@
-Combined Next Steps Plan:
-Feature	Next Steps to Implement
-1. User Profiles	Profile edit form, picture upload, validation, Firestore + Auth updates
-2. Advanced Favorites	Categories/tags UI, Firestore schema update, notes, sharing
-3. Business Page Enhancements	Opening hours, review submission, galleries, contact/directions buttons
-4. Maps & Location	Map component with markers, clustering, filters, geolocation
-5. Social Features	Follow/unfollow, activity feed, sharing, notifications
