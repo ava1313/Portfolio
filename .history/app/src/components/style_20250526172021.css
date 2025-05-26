@@ -346,7 +346,7 @@ main > *:last-child {
 }
 
 .trust-counts {
-  font-size: 30px;
+  font-size: 40px;
   margin-top: 40px;
   margin-bottom: 8px;
   font-weight: 700;
@@ -359,6 +359,5 @@ main > *:last-child {
   margin-top: 8px;
   font-weight: 400;
   text-align: center;
-  margin-bottom: -30px;
 }
 

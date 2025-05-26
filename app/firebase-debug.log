@@ -1,0 +1,92 @@
+[debug] [2025-05-26T14:21:42.162Z] ----------------------------------------------------------------------
+[debug] [2025-05-26T14:21:42.165Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Stratis\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2025-05-26T14:21:42.166Z] CLI Version:   14.4.0
+[debug] [2025-05-26T14:21:42.166Z] Platform:      win32
+[debug] [2025-05-26T14:21:42.166Z] Node Version:  v20.10.0
+[debug] [2025-05-26T14:21:42.166Z] Time:          Mon May 26 2025 17:21:42 GMT+0300 (Θερινή ώρα Ανατολικής Ευρώπης)
+[debug] [2025-05-26T14:21:42.167Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-05-26T14:21:42.464Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-05-26T14:21:42.465Z] > authorizing via signed-in user (stratosav1999@gmail.com)
+[debug] [2025-05-26T14:21:42.465Z] [iam] checking project freedome-dfd07 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2025-05-26T14:21:42.467Z] Checked if tokens are valid: false, expires at: 1748268096714
+[debug] [2025-05-26T14:21:42.467Z] Checked if tokens are valid: false, expires at: 1748268096714
+[debug] [2025-05-26T14:21:42.468Z] > refreshing access token with scopes: []
+[debug] [2025-05-26T14:21:42.470Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-05-26T14:21:42.470Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-05-26T14:21:42.739Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-05-26T14:21:42.739Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-05-26T14:21:42.748Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/freedome-dfd07:testIamPermissions [none]
+[debug] [2025-05-26T14:21:42.748Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/freedome-dfd07:testIamPermissions x-goog-quota-user=projects/freedome-dfd07
+[debug] [2025-05-26T14:21:42.749Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/freedome-dfd07:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-05-26T14:21:43.699Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/freedome-dfd07:testIamPermissions 200
+[debug] [2025-05-26T14:21:43.700Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/freedome-dfd07:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-05-26T14:21:43.701Z] Checked if tokens are valid: true, expires at: 1748272901739
+[debug] [2025-05-26T14:21:43.701Z] Checked if tokens are valid: true, expires at: 1748272901739
+[debug] [2025-05-26T14:21:43.702Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/freedome-dfd07 [none]
+[debug] [2025-05-26T14:21:44.137Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/freedome-dfd07 200
+[debug] [2025-05-26T14:21:44.137Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/freedome-dfd07 {"projectId":"freedome-dfd07","projectNumber":"1042730816071","displayName":"Freedome","name":"projects/freedome-dfd07","resources":{"hostingSite":"freedome-dfd07"},"state":"ACTIVE","etag":"1_071ff6e0-e2ed-459f-9759-ef1d7618a10d"}
+[info] 
+[info] === Deploying to 'freedome-dfd07'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2025-05-26T14:21:44.147Z] Checked if tokens are valid: true, expires at: 1748272901739
+[debug] [2025-05-26T14:21:44.148Z] Checked if tokens are valid: true, expires at: 1748272901739
+[debug] [2025-05-26T14:21:44.148Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/freedome-dfd07/versions [none]
+[debug] [2025-05-26T14:21:44.148Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/freedome-dfd07/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2025-05-26T14:21:45.494Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/freedome-dfd07/versions 200
+[debug] [2025-05-26T14:21:45.494Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/freedome-dfd07/versions {"name":"projects/1042730816071/sites/freedome-dfd07/versions/61f268c925cd9544","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[freedome-dfd07]: beginning deploy... 
+[info] i  hosting[freedome-dfd07]: found 23 files in build 
+[debug] [2025-05-26T14:21:45.516Z] [hosting] uploading with 200 concurrency
+[debug] [2025-05-26T14:21:45.524Z] Checked if tokens are valid: true, expires at: 1748272901739
+[debug] [2025-05-26T14:21:45.524Z] Checked if tokens are valid: true, expires at: 1748272901739
+[debug] [2025-05-26T14:21:45.525Z] [hosting] hash cache [YnVpbGQ] stored for 23 files
+[debug] [2025-05-26T14:21:45.526Z] [hosting][hash queue][FINAL] {"max":3,"min":0,"avg":0,"active":0,"complete":23,"success":23,"errored":0,"retried":0,"total":23,"elapsed":7}
+[debug] [2025-05-26T14:21:45.526Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/1042730816071/sites/freedome-dfd07/versions/61f268c925cd9544:populateFiles [none]
+[debug] [2025-05-26T14:21:45.526Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/1042730816071/sites/freedome-dfd07/versions/61f268c925cd9544:populateFiles {"files":{"/robots.txt":"bfe106a3fb878dc83461c86818bf74fc1bdc7f28538ba613cd3e775516ce8b49","/manifest.json":"ee04fb47e525c67d8424ffe9b4d8a8a24e434504478afca4e0ca602146836d4c","/logo512.png":"212b102aa09e51b3b3e06647e81f7801a61333e171f6582e8124379aabccb41d","/logo192.png":"79e2b749561016bc8af300ea19f48347ceed3cb1a54f48ae456172eca45e08f0","/logo.png":"5255cfa9da74e4b1c299d5d5e18e5752e98f1b9a540583dc417dedea206c071c","/index.html":"90b6b1ee6eed94c475e4808c21b792f277e9f84a5d1564222864d70a6d08bd58","/favicon.ico":"27edce7be5922cf0bef7d4136f69b5bfbdd5bf8c13c7b026f71187d41a00aa7d","/asset-manifest.json":"230564f69eaa7f6ba9024afa4508eb5f722993387e2937ff5fbcea0b6a0731d0","/static/js/main.53c06c12.js.map":"5ea1cccb5de5a18b554847bf39e48d18ea56d587c9442796a4a9855768b41c0c","/static/js/main.53c06c12.js.LICENSE.txt":"4f5e987c67370393859929d53df23cfb3a69fac5f64ab29a3e2055702f91591a","/static/js/main.53c06c12.js":"72e46147da8043969ade1cb28c5459542b9adb81e80edd915e21d026f46611db","/static/css/main.fb9e9472.css.map":"8f81204a824e57c64d154ecff6b166fcb0b10e24a01b3457762019db5247cd31","/static/css/main.fb9e9472.css":"7640fafaecbac6069ed4d8bfc7b5f8bd7688ac139b367d73193602663a8825ca","/mainpageimages/9.jpg":"1e9c0abe551209f1b431a2d054bb5158b71401fc588c76ec80da9bc099f4adfe","/mainpageimages/8.jpg":"086f9f637a878176dfda74e11aa4b7d39bc2808d6faf781b9d4f2644b7b8bb4c","/mainpageimages/7.jpg":"325918d83165b3597d82ad64b04237746dfea73e0d311b3fa6ba30c77662ede7","/mainpageimages/6.jpg":"43d86a5e880e9cd956059676281fce3da8663820aa7f508f57facea215637b0b","/mainpageimages/5.jpg":"ade1bb60a0ccf0f88dfdb73143589c8835423f1bbae54e7c3aa6db17aef1c8f2","/mainpageimages/4.jpg":"9abd95ce8a5755a6ae14c0b1073105b3d7e3f821666e3b5be1d30334ffa9c022","/mainpageimages/3.jpg":"c3e4dc80930d3183713c60e1bad80000eb7951f76cc8eedd2d3e9d55b7bf30b3","/mainpageimages/2.jpg":"c88591261a7afb398fec5f288c9bb8fb766bccefdc70bc83a592f71b9a963d21","/mainpageimages/10.jpg":"32a2ff6ba16d3be6a8db8315987b5a4c40eac02b72df729bb358522a470b36c0","/mainpageimages/1.jpg":"1c47b45486c4d6847258930c6021f00b9dd86f011883d9d2b596113d1ed95114"}}
+[debug] [2025-05-26T14:21:45.818Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/1042730816071/sites/freedome-dfd07/versions/61f268c925cd9544:populateFiles 200
+[debug] [2025-05-26T14:21:45.818Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/1042730816071/sites/freedome-dfd07/versions/61f268c925cd9544:populateFiles {"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/freedome-dfd07/versions/61f268c925cd9544/files"}
+[debug] [2025-05-26T14:21:45.819Z] [hosting][populate queue][FINAL] {"max":296,"min":296,"avg":296,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":296}
+[debug] [2025-05-26T14:21:45.819Z] [hosting] uploads queued: 0
+[debug] [2025-05-26T14:21:45.819Z] [hosting][upload queue][FINAL] {"max":0,"min":9999999999,"avg":0,"active":0,"complete":0,"success":0,"errored":0,"retried":0,"total":0,"elapsed":1748269305819}
+[info] +  hosting[freedome-dfd07]: file upload complete 
+[debug] [2025-05-26T14:21:45.820Z] [hosting] deploy completed after 323ms
+[debug] [2025-05-26T14:21:45.820Z] [
+  {
+    "config": {
+      "public": "build",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "site": "freedome-dfd07"
+    },
+    "version": "projects/1042730816071/sites/freedome-dfd07/versions/61f268c925cd9544"
+  }
+]
+[info] i  hosting[freedome-dfd07]: finalizing version... 
+[debug] [2025-05-26T14:21:45.822Z] Checked if tokens are valid: true, expires at: 1748272901739
+[debug] [2025-05-26T14:21:45.822Z] Checked if tokens are valid: true, expires at: 1748272901739
+[debug] [2025-05-26T14:21:45.823Z] >>> [apiv2][query] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/freedome-dfd07/versions/61f268c925cd9544 updateMask=status%2Cconfig
+[debug] [2025-05-26T14:21:45.823Z] >>> [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/freedome-dfd07/versions/61f268c925cd9544 {"status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]}}
+[debug] [2025-05-26T14:21:46.074Z] <<< [apiv2][status] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/freedome-dfd07/versions/61f268c925cd9544 200
+[debug] [2025-05-26T14:21:46.074Z] <<< [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/freedome-dfd07/versions/61f268c925cd9544 {"name":"projects/1042730816071/sites/freedome-dfd07/versions/61f268c925cd9544","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-05-26T14:21:45.036564Z","createUser":{"email":"stratosav1999@gmail.com"},"finalizeTime":"2025-05-26T14:21:45.862216Z","finalizeUser":{"email":"stratosav1999@gmail.com"}}
+[debug] [2025-05-26T14:21:46.074Z] [hosting] finalized version for freedome-dfd07:[object Object]
+[info] +  hosting[freedome-dfd07]: version finalized 
+[info] i  hosting[freedome-dfd07]: releasing new version... 
+[debug] [2025-05-26T14:21:46.077Z] Checked if tokens are valid: true, expires at: 1748272901739
+[debug] [2025-05-26T14:21:46.077Z] Checked if tokens are valid: true, expires at: 1748272901739
+[debug] [2025-05-26T14:21:46.077Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/freedome-dfd07/channels/live/releases versionName=projects%2F1042730816071%2Fsites%2Ffreedome-dfd07%2Fversions%2F61f268c925cd9544
+[debug] [2025-05-26T14:21:46.078Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/freedome-dfd07/channels/live/releases {}
+[debug] [2025-05-26T14:21:46.425Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/freedome-dfd07/channels/live/releases 200
+[debug] [2025-05-26T14:21:46.426Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/freedome-dfd07/channels/live/releases {"name":"projects/1042730816071/sites/freedome-dfd07/channels/live/releases/1748269305650000","version":{"name":"projects/1042730816071/sites/freedome-dfd07/versions/61f268c925cd9544","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-05-26T14:21:45.036564Z","createUser":{"email":"stratosav1999@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocI7eK8UwT5PySqOIXf45liiU9BIuvKC3hZPRHYluM2_PQOM_cE=mo"},"finalizeTime":"2025-05-26T14:21:45.862216Z","finalizeUser":{"email":"stratosav1999@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocI7eK8UwT5PySqOIXf45liiU9BIuvKC3hZPRHYluM2_PQOM_cE=mo"}},"type":"DEPLOY","releaseTime":"2025-05-26T14:21:45.650Z","releaseUser":{"email":"stratosav1999@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocI7eK8UwT5PySqOIXf45liiU9BIuvKC3hZPRHYluM2_PQOM_cE=mo"}}
+[debug] [2025-05-26T14:21:46.426Z] [hosting] release: {"name":"projects/1042730816071/sites/freedome-dfd07/channels/live/releases/1748269305650000","version":{"name":"projects/1042730816071/sites/freedome-dfd07/versions/61f268c925cd9544","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-05-26T14:21:45.036564Z","createUser":{"email":"stratosav1999@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocI7eK8UwT5PySqOIXf45liiU9BIuvKC3hZPRHYluM2_PQOM_cE=mo"},"finalizeTime":"2025-05-26T14:21:45.862216Z","finalizeUser":{"email":"stratosav1999@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocI7eK8UwT5PySqOIXf45liiU9BIuvKC3hZPRHYluM2_PQOM_cE=mo"}},"type":"DEPLOY","releaseTime":"2025-05-26T14:21:45.650Z","releaseUser":{"email":"stratosav1999@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocI7eK8UwT5PySqOIXf45liiU9BIuvKC3hZPRHYluM2_PQOM_cE=mo"}}
+[info] +  hosting[freedome-dfd07]: release complete 

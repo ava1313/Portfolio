@@ -84,14 +84,11 @@ main {
 }
 
 .actions input[type="text"] {
-  padding: 14px 20px;
-  border-radius: 40px;
-  border: 2px solid black;
-  font-size: 18px;
-  flex-grow: 1;
-  min-width: 180px;
-  max-width: 320px;
-  box-sizing: border-box;
+  border-radius: 6px;
+  border: 1.5px solid #333;
+  font-size: 16px;
+  padding: 10px 15px;
+  font-family: 'EB Garamond', serif;
 }
 .actions button {
     padding: 20px 75px;
@@ -311,54 +308,5 @@ main > *:last-child {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-}
-
-
-
-/* Dropdown list */
-.category-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  max-height: 180px;
-  overflow-y: auto;
-  background-color: white;
-  border: 1.5px solid #333;
-  border-top: none;
-  border-radius: 0 0 6px 6px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  margin-top: 0;
-  padding-left: 0;
-  list-style: none;
-}
-
-.category-dropdown li {
-  padding: 8px 16px;
-  cursor: pointer;
-  font-size: 16px;
-  font-family: 'EB Garamond', serif;
-}
-
-.category-dropdown li:hover {
-  background-color: #eee;
-}
-
-.trust-counts {
-  font-size: 30px;
-  margin-top: 40px;
-  margin-bottom: 8px;
-  font-weight: 700;
-  text-align: center;
-  font-family: 'EB Garamond', serif;
-  color: #222;
-}
-
-.subtitle {
-  margin-top: 8px;
-  font-weight: 400;
-  text-align: center;
-  margin-bottom: -30px;
 }
 
