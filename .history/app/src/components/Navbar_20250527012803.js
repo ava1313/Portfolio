@@ -22,7 +22,9 @@ export default function Navbar() {
   });
   const [submitting, setSubmitting] = useState(false);
 
+  // Mobile menu open toggle
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Detect mobile viewport width
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
@@ -75,23 +77,7 @@ export default function Navbar() {
     flexShrink: 0,
   };
 
-  // Το κάθε nav item κάθετα εικονίδιο + κείμενο
-  const navItemStyle = {
-    cursor: "pointer",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 6,
-    outline: "none",
-    userSelect: "none",
-  };
-
-  const labelStyle = {
-    fontSize: 12,
-    whiteSpace: "nowrap",
-    color: "#000",
-  };
-
+  // Modal + form handlers (unchanged)
   const openCreateModal = () => {
     setModalType("offers");
     setFormData({
@@ -180,31 +166,31 @@ export default function Navbar() {
     }
   };
 
+  // Burger icon for mobile toggle
   const BurgerIcon = ({ open, onClick }) => (
     <button
-      aria-label={open ? "Close menu" : "Open menu"}
+      aria-label="Toggle menu"
       onClick={onClick}
       style={{
         background: "none",
         border: "none",
         cursor: "pointer",
-        padding: 12,
+        padding: 8,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-around",
-        width: 40,
-        height: 32,
-        boxSizing: "content-box",
+        width: 30,
+        height: 24,
       }}
     >
       <span
         style={{
           display: "block",
-          width: 28,
-          height: 4,
+          width: 24,
+          height: 3,
           backgroundColor: open ? "#191919" : "#000",
           borderRadius: 2,
-          transform: open ? "rotate(45deg) translate(6px, 6px)" : "none",
+          transform: open ? "rotate(45deg) translate(5px, 5px)" : "none",
           transition: "all 0.3s ease",
           transformOrigin: "center",
         }}
@@ -212,8 +198,8 @@ export default function Navbar() {
       <span
         style={{
           display: "block",
-          width: 28,
-          height: 4,
+          width: 24,
+          height: 3,
           backgroundColor: open ? "transparent" : "#000",
           transition: "all 0.3s ease",
         }}
@@ -221,11 +207,11 @@ export default function Navbar() {
       <span
         style={{
           display: "block",
-          width: 28,
-          height: 4,
+          width: 24,
+          height: 3,
           backgroundColor: open ? "#191919" : "#000",
           borderRadius: 2,
-          transform: open ? "rotate(-45deg) translate(6px, -6px)" : "none",
+          transform: open ? "rotate(-45deg) translate(5px, -5px)" : "none",
           transition: "all 0.3s ease",
           transformOrigin: "center",
         }}
@@ -233,17 +219,9 @@ export default function Navbar() {
     </button>
   );
 
-  // Στο desktop τα nav groups είναι σε σειρά με οριζόντιο gap,
-  // αλλά το κάθε nav item έχει κάθετο stack (εικονίδιο + label)
+  // Nav items for left and right groups
   const LeftNavItems = () => (
-    <div
-      style={{
-        display: "flex",
-        gap: 48,
-        alignItems: "center",
-        flexDirection: isMobile ? "column" : "row",
-      }}
-    >
+    <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
       {/* Map */}
       <div
         role="button"
@@ -259,28 +237,24 @@ export default function Navbar() {
           }
         }}
         aria-label="Χάρτης Επιχειρήσεων"
-        style={navItemStyle}
+        style={buttonStyle}
       >
-        <div style={buttonStyle}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            stroke="black"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path d="M12 21c-4.97-5.38-8-8.65-8-11a8 8 0 1116 0c0 2.35-3.03 5.62-8 11z" />
-            <circle cx="12" cy="10" r="3" />
-          </svg>
-        </div>
-        <span style={labelStyle}>Χάρτης Επιχειρήσεων</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          stroke="black"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path d="M12 21c-4.97-5.38-8-8.65-8-11a8 8 0 1116 0c0 2.35-3.03 5.62-8 11z" />
+          <circle cx="12" cy="10" r="3" />
+        </svg>
       </div>
-
       {/* Offers */}
       <div
         role="button"
@@ -296,27 +270,23 @@ export default function Navbar() {
           }
         }}
         aria-label="Προσφορές"
-        style={navItemStyle}
+        style={buttonStyle}
       >
-        <div style={buttonStyle}>
-          <svg
-            width="24"
-            height="24"
-            fill="none"
-            stroke="black"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path d="M20 12.5V7a2 2 0 0 0-2-2h-5.5a2 2 0 0 0-1.41.59l-7.09 7.09a2 2 0 0 0 0 2.82l5.5 5.5a2 2 0 0 0 2.82 0l7.09-7.09A2 2 0 0 0 20 12.5z" />
-            <circle cx="7.5" cy="7.5" r="1.5" />
-          </svg>
-        </div>
-        <span style={labelStyle}>Προσφορές</span>
+        <svg
+          width="24"
+          height="24"
+          fill="none"
+          stroke="black"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path d="M20 12.5V7a2 2 0 0 0-2-2h-5.5a2 2 0 0 0-1.41.59l-7.09 7.09a2 2 0 0 0 0 2.82l5.5 5.5a2 2 0 0 0 2.82 0l7.09-7.09A2 2 0 0 0 20 12.5z" />
+          <circle cx="7.5" cy="7.5" r="1.5" />
+        </svg>
       </div>
-
       {/* Events */}
       <div
         role="button"
@@ -332,39 +302,28 @@ export default function Navbar() {
           }
         }}
         aria-label="Εκδηλώσεις"
-        style={navItemStyle}
+        style={buttonStyle}
       >
-        <div style={buttonStyle}>
-          <svg
-            width="24"
-            height="24"
-            fill="none"
-            stroke="black"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <rect x="3" y="4" width="18" height="18" rx="2" />
-            <path d="M16 2v4M8 2v4M3 10h18" />
-          </svg>
-        </div>
-        <span style={labelStyle}>Εκδηλώσεις</span>
+        <svg
+          width="24"
+          height="24"
+          fill="none"
+          stroke="black"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <path d="M16 2v4M8 2v4M3 10h18" />
+        </svg>
       </div>
     </div>
   );
 
   const RightNavItems = () => (
-    <div
-      style={{
-        display: "flex",
-        gap: 48,
-        alignItems: "center",
-        flexShrink: 0,
-        flexDirection: isMobile ? "column" : "row",
-      }}
-    >
+    <div style={{ display: "flex", gap: 16, alignItems: "center", flexShrink: 0 }}>
       {/* Profile */}
       <div
         role="button"
@@ -380,25 +339,22 @@ export default function Navbar() {
           }
         }}
         aria-label="User profile icon"
-        style={navItemStyle}
+        style={buttonStyle}
       >
-        <div style={buttonStyle}>
-          <svg
-            viewBox="0 0 40 40"
-            width="24"
-            height="24"
-            fill="none"
-            stroke="black"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <circle cx="20" cy="15" r="8" />
-            <path d="M4 38c0-7 14-11 16-11s16 4 16 11" />
-          </svg>
-        </div>
-        <span style={labelStyle}>Το προφίλ μου</span>
+        <svg
+          viewBox="0 0 40 40"
+          width="24"
+          height="24"
+          fill="none"
+          stroke="black"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="20" cy="15" r="8" />
+          <path d="M4 38c0-7 14-11 16-11s16 4 16 11" />
+        </svg>
       </div>
 
       {/* BusinessPage */}
@@ -418,25 +374,22 @@ export default function Navbar() {
           }}
           aria-label="Business page"
           title="Η Σελίδα της Επιχείρησής σας"
-          style={navItemStyle}
+          style={buttonStyle}
         >
-          <div style={buttonStyle}>
-            <svg
-              width="24"
-              height="24"
-              fill="none"
-              stroke="black"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <rect x="2" y="7" width="20" height="13" rx="2.5" />
-              <path d="M6 7V5a4 4 0 0 1 12 0v2" />
-            </svg>
-          </div>
-          <span style={labelStyle}>Η επιχείρησή μου</span>
+          <svg
+            width="24"
+            height="24"
+            fill="none"
+            stroke="black"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <rect x="2" y="7" width="20" height="13" rx="2.5" />
+            <path d="M6 7V5a4 4 0 0 1 12 0v2" />
+          </svg>
         </div>
       )}
 
@@ -455,40 +408,38 @@ export default function Navbar() {
           }
         }}
         aria-label="Favorites"
-        style={navItemStyle}
+        style={buttonStyle}
       >
-        <div style={buttonStyle}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            stroke="black"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6 4 4 6.5 4c1.54 0 3.04.99 3.57 2.36h1.87C14.46 4.99 15.96 4 17.5 4 20 4 22 6 22 8.5c0 3.78-3.4 6.86-8.55 11.18L12 21z" />
-          </svg>
-        </div>
-        <span style={labelStyle}>Αγαπημένα</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          stroke="black"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6 4 4 6.5 4c1.54 0 3.04.99 3.57 2.36h1.87C14.46 4.99 15.96 4 17.5 4 20 4 22 6 22 8.5c0 3.78-3.4 6.86-8.55 11.18L12 21z" />
+        </svg>
       </div>
     </div>
   );
 
+  // Combined nav items used inside mobile menu panel (all stacked vertically)
   const MobileMenuItems = () => (
     <nav
       aria-label="Mobile navigation menu"
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: 40,
+        gap: 20,
         padding: 20,
-        paddingTop: 0,
       }}
     >
+      {/* All nav icons repeated here, stacked vertically */}
       <LeftNavItems />
       <RightNavItems />
     </nav>
@@ -512,8 +463,9 @@ export default function Navbar() {
           position: "relative",
         }}
       >
-        {/* Left nav for desktop or column for mobile */}
+        {/* Left nav - desktop only */}
         {!isMobile && <LeftNavItems />}
+
         {/* Logo */}
         <img
           src="/logo.png"
@@ -541,9 +493,11 @@ export default function Navbar() {
           }}
           aria-label="Go to homepage"
         />
+
+        {/* Right nav - desktop only */}
         {!isMobile && <RightNavItems />}
 
-        {/* Mobile burger + floating + button */}
+        {/* Mobile: burger menu + floating + button */}
         {isMobile && (
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             {!loadingRole && userRole === "business" && (
@@ -576,7 +530,7 @@ export default function Navbar() {
         )}
       </header>
 
-      {/* Mobile menu panel */}
+      {/* Mobile sliding menu */}
       {isMobile && mobileMenuOpen && (
         <div
           style={{
@@ -590,29 +544,8 @@ export default function Navbar() {
             zIndex: 10500,
             paddingTop: 60,
             boxSizing: "border-box",
-            display: "flex",
-            flexDirection: "column",
           }}
         >
-          <button
-            onClick={() => setMobileMenuOpen(false)}
-            aria-label="Close menu"
-            style={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              fontSize: 24,
-              fontWeight: "bold",
-              padding: 4,
-              lineHeight: 1,
-              userSelect: "none",
-            }}
-          >
-            ×
-          </button>
           <MobileMenuItems />
         </div>
       )}

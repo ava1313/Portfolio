@@ -75,7 +75,6 @@ export default function Navbar() {
     flexShrink: 0,
   };
 
-  // Το κάθε nav item κάθετα εικονίδιο + κείμενο
   const navItemStyle = {
     cursor: "pointer",
     display: "flex",
@@ -233,17 +232,8 @@ export default function Navbar() {
     </button>
   );
 
-  // Στο desktop τα nav groups είναι σε σειρά με οριζόντιο gap,
-  // αλλά το κάθε nav item έχει κάθετο stack (εικονίδιο + label)
   const LeftNavItems = () => (
-    <div
-      style={{
-        display: "flex",
-        gap: 48,
-        alignItems: "center",
-        flexDirection: isMobile ? "column" : "row",
-      }}
-    >
+    <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
       {/* Map */}
       <div
         role="button"
@@ -356,15 +346,7 @@ export default function Navbar() {
   );
 
   const RightNavItems = () => (
-    <div
-      style={{
-        display: "flex",
-        gap: 48,
-        alignItems: "center",
-        flexShrink: 0,
-        flexDirection: isMobile ? "column" : "row",
-      }}
-    >
+    <div style={{ display: "flex", gap: 24, alignItems: "center", flexShrink: 0 }}>
       {/* Profile */}
       <div
         role="button"
@@ -484,7 +466,7 @@ export default function Navbar() {
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: 40,
+        gap: 36,
         padding: 20,
         paddingTop: 0,
       }}
@@ -512,8 +494,9 @@ export default function Navbar() {
           position: "relative",
         }}
       >
-        {/* Left nav for desktop or column for mobile */}
+        {/* Left nav for desktop */}
         {!isMobile && <LeftNavItems />}
+
         {/* Logo */}
         <img
           src="/logo.png"
@@ -541,9 +524,11 @@ export default function Navbar() {
           }}
           aria-label="Go to homepage"
         />
+
+        {/* Right nav for desktop */}
         {!isMobile && <RightNavItems />}
 
-        {/* Mobile burger + floating + button */}
+        {/* Mobile: burger + floating + button */}
         {isMobile && (
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             {!loadingRole && userRole === "business" && (
