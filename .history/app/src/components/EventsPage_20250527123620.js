@@ -252,7 +252,7 @@ export default function EventsPage() {
             <input
               type="text"
               aria-label="Αναζήτηση κατηγορίας"
-              placeholder="Κατηγορία"
+              placeholder="Επιλέξτε κατηγορία ή πληκτρολογήστε..."
               value={searchCategory}
               onChange={e => setSearchCategory(e.target.value)}
               autoComplete="off"
@@ -312,7 +312,7 @@ export default function EventsPage() {
               value={searchBusinessType}
               onChange={e => setSearchBusinessType(e.target.value)}
             >
-              <option value="">Φίλτρο</option>
+              <option value="">Επιλέξτε τύπο επιχείρησης</option>
               {businessTypes.map((type, idx) => (
                 <option key={idx} value={type}>
                   {type}

@@ -1,142 +1,122 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   collection,
   query,
   getDocs,
+  orderBy,
   doc,
-  getDoc,
   updateDoc,
   arrayUnion,
   arrayRemove,
+  getDoc,
 } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import Navbar from "./Navbar";
-import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
-import categories from "../data/categories";
-import "./style.css";
 
-const flattenCategories = () =>
-  categories.flatMap((cat) => [cat.name, ...(cat.subcategories || [])]);
-
-const businessTypes = [
-  "Απλή Επιχείρηση",
-  "Κυριλέ Επιχείρηση",
-  "Εμπορική Επιχείρηση",
-  "Νεοφυής Επιχείρηση",
-  "Άλλη",
-];
-const libraries = ["places"];
+const cardStyle = {
+  marginBottom: 24,
+  padding: 18,
+  borderRadius: 14,
+  boxShadow: "0 1px 8px rgba(0,0,0,0.11)",
+  backgroundColor: "#fff",
+  marginTop: 22,
+};
 
 export default function EventsPage() {
-  // UI
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [businesses, setBusinesses] = useState({});
   const [user, setUser] = useState(null);
   const [toast, setToast] = useState({ open: false, message: "", type: "info" });
 
-  // MainPage-style filter states
-  const [searchCategory, setSearchCategory] = useState("");
-  const [searchLocation, setSearchLocation] = useState("");
-  const [searchBusinessType, setSearchBusinessType] = useState("");
-  const [dateOrder, setDateOrder] = useState("desc");
+  // Φίλτρα
+  const [filterCategory, setFilterCategory] = useState("");
+  const [dateOrder, setDateOrder] = useState("desc"); // 'desc' ή 'asc'
+  const [categories, setCategories] = useState([]); // Δυναμικές κατηγορίες
 
-  // Google Maps autocomplete
-  const autocompleteRef = useRef(null);
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-    libraries,
-  });
-  const onLoad = (autocomplete) => (autocompleteRef.current = autocomplete);
-  const onPlaceChanged = () => {
-    if (autocompleteRef.current) {
-      const place = autocompleteRef.current.getPlace();
-      const address = place.formatted_address || place.name || "";
-      setSearchLocation(address);
-    }
-  };
-
-  // Live user state
+  // Live user state sync
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (usr) => setUser(usr));
     return () => unsub();
   }, []);
 
-  // Fetch all events & businesses
   useEffect(() => {
-    fetchEventsAndBusinesses();
-    // eslint-disable-next-line
-  }, []);
+    async function fetchEventsAndBusinesses() {
+      setLoading(true);
+      try {
+        // Φόρτωσε events
+        const q = query(collection(db, "events"));
+        const snap = await getDocs(q);
+        let data = snap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        }));
 
-  async function fetchEventsAndBusinesses() {
-    setLoading(true);
-    try {
-      const q = query(collection(db, "events"));
-      const snap = await getDocs(q);
-      let data = snap.docs.map((d) => ({
-        id: d.id,
-        ...d.data(),
-      }));
+        // Συλλογή μοναδικών businessId
+        const uniqueBusinessIds = Array.from(
+          new Set(data.map((evt) => evt.businessId).filter(Boolean))
+        );
 
-      // Get business data for all events
-      const uniqueBusinessIds = Array.from(
-        new Set(data.map((evt) => evt.businessId).filter(Boolean))
-      );
-      const businessFetches = uniqueBusinessIds.map((bid) =>
-        getDoc(doc(db, "users", bid)).then((snap) => ({
-          id: bid,
-          ...((snap.exists() && snap.data().profile) || {}),
-          businessName:
-            snap.exists() && snap.data().profile
-              ? snap.data().profile.businessName
-              : "Άγνωστη επιχείρηση",
-          businessLogo:
-            snap.exists() && snap.data().profile
-              ? snap.data().profile.businessLogo
-              : "/placeholder-logo.png",
-          businessCategory:
-            snap.exists() && snap.data().profile
-              ? snap.data().profile.businessCategory
-              : "",
-          businessLocation:
-            snap.exists() && snap.data().profile
-              ? snap.data().profile.businessLocation
-              : "",
-          businessType:
-            snap.exists() && snap.data().profile
-              ? snap.data().profile.businessType
-              : "",
-        }))
-      );
-      const businessesArr = await Promise.all(businessFetches);
-      const businessesMap = {};
-      businessesArr.forEach((b) => {
-        businessesMap[b.id] = b;
-      });
-      setBusinesses(businessesMap);
+        // Φόρτωσε επιχειρήσεις αυτών των IDs
+        const businessFetches = uniqueBusinessIds.map((bid) =>
+          getDoc(doc(db, "users", bid)).then((snap) => ({
+            id: bid,
+            ...((snap.exists() && snap.data().profile) || {}),
+            businessName:
+              snap.exists() && snap.data().profile
+                ? snap.data().profile.businessName
+                : "Άγνωστη επιχείρηση",
+            businessLogo:
+              snap.exists() && snap.data().profile
+                ? snap.data().profile.businessLogo
+                : "/placeholder-logo.png",
+          }))
+        );
+        const businessesArr = await Promise.all(businessFetches);
 
-      // Attach business info to each event
-      data = data.map((evt) => ({
-        ...evt,
-        _business: businessesMap[evt.businessId] || {},
-      }));
+        // Δημιουργία map επιχειρήσεων
+        const businessesMap = {};
+        businessesArr.forEach((b) => {
+          businessesMap[b.id] = b;
+        });
+        setBusinesses(businessesMap);
 
-      // Sort by date
-      data.sort((a, b) => {
-        if (!a.date || !b.date) return 0;
-        const dateA = new Date(a.date);
-        const dateB = new Date(b.date);
-        return dateOrder === "asc" ? dateA - dateB : dateB - dateA;
-      });
+        // Βρες μοναδικές κατηγορίες επιχειρήσεων που έχουν events
+        const catsSet = new Set();
+        businessesArr.forEach((b) => {
+          if (b.businessCategory) {
+            catsSet.add(b.businessCategory);
+          }
+        });
+        setCategories([...catsSet].sort());
 
-      setEvents(data);
-    } catch (error) {
-      console.error("Error fetching events or businesses:", error);
-      showToast("Σφάλμα κατά την ανάκτηση των εκδηλώσεων.", "error");
+        // Φιλτράρισμα κατηγορίας (αν έχει ο χρήστης επιλέξει)
+        if (filterCategory) {
+          data = data.filter((evt) => {
+            const bizCat = businessesMap[evt.businessId]?.businessCategory;
+            return bizCat && bizCat.toLowerCase() === filterCategory.toLowerCase();
+          });
+        }
+
+        // Ταξινόμηση ημερομηνίας
+        data.sort((a, b) => {
+          if (!a.date || !b.date) return 0;
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return dateOrder === "asc" ? dateA - dateB : dateB - dateA;
+        });
+
+        setEvents(data);
+      } catch (error) {
+        console.error("Error fetching events or businesses:", error);
+        showToast("Σφάλμα κατά την ανάκτηση των εκδηλώσεων.", "error");
+      }
+      setLoading(false);
     }
-    setLoading(false);
-  }
+    fetchEventsAndBusinesses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterCategory, dateOrder]);
 
   // Toast helper
   function showToast(message, type = "info") {
@@ -188,182 +168,93 @@ export default function EventsPage() {
       .catch(() => showToast("Αποτυχία αντιγραφής συνδέσμου.", "error"));
   };
 
-  // FILTER FUNCTION
-  function eventMatches(event) {
-    // Category filter
-    if (
-      searchCategory &&
-      event._business.businessCategory &&
-      !event._business.businessCategory
-        .toLowerCase()
-        .includes(searchCategory.toLowerCase())
-    ) {
-      return false;
-    }
-    // Location filter
-    if (
-      searchLocation &&
-      event._business.businessLocation &&
-      !event._business.businessLocation
-        .toLowerCase()
-        .includes(searchLocation.toLowerCase())
-    ) {
-      return false;
-    }
-    // Business type filter
-    if (
-      searchBusinessType &&
-      event._business.businessType &&
-      !event._business.businessType
-        .toLowerCase()
-        .includes(searchBusinessType.toLowerCase())
-    ) {
-      return false;
-    }
-    return true;
-  }
-
-  // SEARCH BUTTON HANDLER
-  function handleEventSearch() {
-    // Just triggers a re-render since we filter in render
-    setEvents((old) => [...old]);
-  }
-
-  // Styles for card
-  const cardStyle = {
-    marginBottom: 24,
-    padding: 18,
-    borderRadius: 14,
-    boxShadow: "0 1px 8px rgba(0,0,0,0.11)",
-    backgroundColor: "#fff",
-    marginTop: 22,
-  };
-
   return (
     <>
       <Navbar />
       <div style={{ maxWidth: 700, margin: "40px auto", padding: 16 }}>
         <h1>Εκδηλώσεις</h1>
 
-        {/* MainPage-style Search Bar */}
-        <div className="actions" style={{ marginBottom: 18 }}>
-          {/* Category */}
-          <div className="input-group">
-            <input
-              type="text"
-              aria-label="Αναζήτηση κατηγορίας"
-              placeholder="Κατηγορία"
-              value={searchCategory}
-              onChange={e => setSearchCategory(e.target.value)}
-              autoComplete="off"
-            />
-            {searchCategory &&
-              flattenCategories()
-                .filter(
-                  cat =>
-                    cat.toLowerCase().includes(searchCategory.toLowerCase()) &&
-                    cat.toLowerCase() !== searchCategory.toLowerCase()
-                ).length > 0 && (
-                <ul className="category-dropdown">
-                  {flattenCategories()
-                    .filter(
-                      cat =>
-                        cat.toLowerCase().includes(searchCategory.toLowerCase()) &&
-                        cat.toLowerCase() !== searchCategory.toLowerCase()
-                    )
-                    .map((cat, idx) => (
-                      <li
-                        key={idx}
-                        onClick={() => setSearchCategory(cat)}
-                        onMouseDown={e => e.preventDefault()}
-                      >
-                        {cat}
-                      </li>
-                    ))}
-                </ul>
-              )}
-          </div>
-          {/* Location */}
-          <div className="input-group">
-            {isLoaded ? (
-              <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
-                <input
-                  type="text"
-                  placeholder="Τοποθεσία"
-                  value={searchLocation}
-                  onChange={e => setSearchLocation(e.target.value)}
-                  aria-label="Τοποθεσία"
-                />
-              </Autocomplete>
-            ) : (
-              <input
-                type="text"
-                placeholder="Τοποθεσία"
-                value={searchLocation}
-                onChange={e => setSearchLocation(e.target.value)}
-                aria-label="Τοποθεσία"
-              />
-            )}
-          </div>
-          {/* Business type */}
-          <div className="input-group">
-            <select
-              aria-label="Φίλτρο τύπου επιχείρησης"
-              value={searchBusinessType}
-              onChange={e => setSearchBusinessType(e.target.value)}
+        {/* Φίλτρα */}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 16,
+            marginBottom: 20,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", minWidth: 160 }}>
+            <label
+              htmlFor="categoryFilter"
+              style={{ fontWeight: "600", marginBottom: 6, fontSize: 16 }}
             >
-              <option value="">Φίλτρο</option>
-              {businessTypes.map((type, idx) => (
-                <option key={idx} value={type}>
-                  {type}
+              Κατηγορία:
+            </label>
+            <select
+              id="categoryFilter"
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              style={{
+                padding: "8px 12px",
+                fontSize: 16,
+                borderRadius: 8,
+                border: "1.5px solid #191919",
+                cursor: "pointer",
+                backgroundColor: "#fff",
+                color: "#191919",
+                transition: "border-color 0.3s",
+              }}
+              onFocus={(e) => (e.target.style.borderColor = "#555")}
+              onBlur={(e) => (e.target.style.borderColor = "#191919")}
+            >
+              <option value="">Όλες</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
                 </option>
               ))}
             </select>
           </div>
-          {/* Search icon */}
-          <button
-            className="search-icon"
-            aria-label="Αναζήτηση"
-            onClick={handleEventSearch}
-          >
-            <svg viewBox="0 0 30 30" width="22" height="22" aria-hidden="true">
-              <circle cx="14" cy="14" r="10" stroke="black" strokeWidth="2.5" fill="none" />
-              <line x1="26" y1="26" x2="20" y2="20" stroke="black" strokeWidth="2.5" />
-            </svg>
-          </button>
+
+          <div style={{ display: "flex", flexDirection: "column", minWidth: 160 }}>
+            <label
+              htmlFor="dateOrderFilter"
+              style={{ fontWeight: "600", marginBottom: 6, fontSize: 16 }}
+            >
+              Ταξινόμηση Ημερομηνίας:
+            </label>
+            <select
+              id="dateOrderFilter"
+              value={dateOrder}
+              onChange={(e) => setDateOrder(e.target.value)}
+              style={{
+                padding: "8px 12px",
+                fontSize: 16,
+                borderRadius: 8,
+                border: "1.5px solid #191919",
+                cursor: "pointer",
+                backgroundColor: "#fff",
+                color: "#191919",
+                transition: "border-color 0.3s",
+              }}
+              onFocus={(e) => (e.target.style.borderColor = "#555")}
+              onBlur={(e) => (e.target.style.borderColor = "#191919")}
+            >
+              <option value="desc">Φθίνουσα</option>
+              <option value="asc">Αύξουσα</option>
+            </select>
+          </div>
         </div>
 
-        {/* Date order filter */}
-        <div style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: 8
-        }}>
-          <select
-            value={dateOrder}
-            onChange={e => setDateOrder(e.target.value)}
-            style={{
-              padding: "6px 12px",
-              fontSize: 15,
-              borderRadius: 8,
-              border: "1.2px solid #191919",
-              background: "#fff",
-              color: "#191919"
-            }}
-          >
-            <option value="desc">Νεότερες πρώτα</option>
-            <option value="asc">Παλαιότερες πρώτα</option>
-          </select>
-        </div>
-
-        {/* Loading / No Events / Events */}
         {loading ? (
           <div style={{ textAlign: "center", marginTop: 80 }}>Φόρτωση...</div>
-        ) : events.filter(eventMatches).length === 0 ? (
+        ) : events.length === 0 ? (
           <div style={{ color: "#888", textAlign: "center" }}>Δεν υπάρχουν εκδηλώσεις.</div>
         ) : (
-          events.filter(eventMatches).map((evt) => {
-            const biz = evt._business || {};
+          events.map((evt) => {
+            const biz = businesses[evt.businessId] || {};
             const going = evt.attendees?.includes(user?.uid);
 
             return (
@@ -403,8 +294,8 @@ export default function EventsPage() {
                     onClick={() =>
                       evt.businessId && window.location.assign(`/business/${evt.businessId}`)
                     }
-                    onMouseEnter={e => (e.currentTarget.style.background = "#28324a")}
-                    onMouseLeave={e => (e.currentTarget.style.background = "#202b40")}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#28324a")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "#202b40")}
                   >
                     Προφίλ Επιχείρησης
                   </button>
@@ -447,10 +338,10 @@ export default function EventsPage() {
                       cursor: "pointer",
                       transition: "background .18s",
                     }}
-                    onMouseEnter={e =>
+                    onMouseEnter={(e) =>
                       (e.currentTarget.style.background = going ? "#d03131" : "#0d9356")
                     }
-                    onMouseLeave={e =>
+                    onMouseLeave={(e) =>
                       (e.currentTarget.style.background = going ? "#ff4242" : "#13b36e")
                     }
                   >

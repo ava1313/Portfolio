@@ -252,7 +252,7 @@ export default function EventsPage() {
             <input
               type="text"
               aria-label="Αναζήτηση κατηγορίας"
-              placeholder="Κατηγορία"
+              placeholder="Επιλέξτε κατηγορία ή πληκτρολογήστε..."
               value={searchCategory}
               onChange={e => setSearchCategory(e.target.value)}
               autoComplete="off"

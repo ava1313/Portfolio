@@ -5,12 +5,8 @@ import {
   getDocs,
   doc,
   getDoc,
-  updateDoc,
-  arrayUnion,
-  arrayRemove,
 } from "firebase/firestore";
-import { db, auth } from "../firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { db } from "../firebase";
 import Navbar from "./Navbar";
 import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
 import categories from "../data/categories";
@@ -28,22 +24,19 @@ const businessTypes = [
 ];
 const libraries = ["places"];
 
-export default function EventsPage() {
-  // UI
-  const [events, setEvents] = useState([]);
+export default function OffersPage() {
+  const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [businesses, setBusinesses] = useState({});
-  const [user, setUser] = useState(null);
   const [toast, setToast] = useState({ open: false, message: "", type: "info" });
 
-  // MainPage-style filter states
+  // Search bar states
   const [searchCategory, setSearchCategory] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [searchBusinessType, setSearchBusinessType] = useState("");
-  const [dateOrder, setDateOrder] = useState("desc");
-
-  // Google Maps autocomplete
   const autocompleteRef = useRef(null);
+
+  // Google Maps autocomplete loader
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries,
@@ -57,32 +50,29 @@ export default function EventsPage() {
     }
   };
 
-  // Live user state
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (usr) => setUser(usr));
-    return () => unsub();
-  }, []);
-
-  // Fetch all events & businesses
-  useEffect(() => {
-    fetchEventsAndBusinesses();
+    fetchOffersAndBusinesses();
     // eslint-disable-next-line
   }, []);
 
-  async function fetchEventsAndBusinesses() {
+  async function fetchOffersAndBusinesses() {
     setLoading(true);
     try {
-      const q = query(collection(db, "events"));
+      // Φόρτωσε όλες τις προσφορές
+      const q = query(collection(db, "offers"));
       const snap = await getDocs(q);
-      let data = snap.docs.map((d) => ({
-        id: d.id,
-        ...d.data(),
+      let data = snap.docs.map((doc) => ({
+        id: doc.id,
+        businessId: doc.data().businessId,
+        ...doc.data(),
       }));
 
-      // Get business data for all events
+      // Συλλογή μοναδικών businessId
       const uniqueBusinessIds = Array.from(
-        new Set(data.map((evt) => evt.businessId).filter(Boolean))
+        new Set(data.map((offer) => offer.businessId).filter(Boolean))
       );
+
+      // Φόρτωσε τις επιχειρήσεις που αντιστοιχούν
       const businessFetches = uniqueBusinessIds.map((bid) =>
         getDoc(doc(db, "users", bid)).then((snap) => ({
           id: bid,
@@ -90,6 +80,8 @@ export default function EventsPage() {
           businessName:
             snap.exists() && snap.data().profile
               ? snap.data().profile.businessName
+              : snap.exists() && snap.data().businessName
+              ? snap.data().businessName
               : "Άγνωστη επιχείρηση",
           businessLogo:
             snap.exists() && snap.data().profile
@@ -116,70 +108,25 @@ export default function EventsPage() {
       });
       setBusinesses(businessesMap);
 
-      // Attach business info to each event
-      data = data.map((evt) => ({
-        ...evt,
-        _business: businessesMap[evt.businessId] || {},
+      // Attach business info to each offer
+      data = data.map((offer) => ({
+        ...offer,
+        _business: businessesMap[offer.businessId] || {},
       }));
 
-      // Sort by date
-      data.sort((a, b) => {
-        if (!a.date || !b.date) return 0;
-        const dateA = new Date(a.date);
-        const dateB = new Date(b.date);
-        return dateOrder === "asc" ? dateA - dateB : dateB - dateA;
-      });
-
-      setEvents(data);
+      setOffers(data);
     } catch (error) {
-      console.error("Error fetching events or businesses:", error);
-      showToast("Σφάλμα κατά την ανάκτηση των εκδηλώσεων.", "error");
+      console.error("Error fetching offers or businesses:", error);
+      showToast("Σφάλμα κατά την ανάκτηση των προσφορών.", "error");
     }
     setLoading(false);
   }
 
-  // Toast helper
   function showToast(message, type = "info") {
     setToast({ open: true, message, type });
-    setTimeout(() => setToast({ open: false, message: "", type: "info" }), 2500);
+    setTimeout(() => setToast({ open: false, message: "", type: "info" }), 2300);
   }
 
-  const toggleGoing = async (evt) => {
-    if (!user)
-      return showToast("Πρέπει να είστε συνδεδεμένος για να δηλώσετε συμμετοχή.", "error");
-    const ref = doc(db, "events", evt.id);
-    const currentAttendees = evt.attendees || [];
-    const isGoing = currentAttendees.includes(user.uid);
-
-    try {
-      await updateDoc(ref, {
-        attendees: isGoing ? arrayRemove(user.uid) : arrayUnion(user.uid),
-      });
-      setEvents((es) =>
-        es.map((e) =>
-          e.id === evt.id
-            ? {
-                ...e,
-                attendees: isGoing
-                  ? currentAttendees.filter((u) => u !== user.uid)
-                  : [...currentAttendees, user.uid],
-              }
-            : e
-        )
-      );
-      showToast(
-        isGoing
-          ? "Δηλώσατε ότι δεν θα έρθετε."
-          : "Δηλώσατε συμμετοχή στην εκδήλωση!",
-        "success"
-      );
-    } catch (error) {
-      console.error("Error updating attendance:", error);
-      showToast("Σφάλμα κατά την ενημέρωση της συμμετοχής.", "error");
-    }
-  };
-
-  // Copy business profile url to clipboard
   const copyLink = (businessId) => {
     const url = `${window.location.origin}/business/${businessId}`;
     navigator.clipboard
@@ -189,12 +136,12 @@ export default function EventsPage() {
   };
 
   // FILTER FUNCTION
-  function eventMatches(event) {
+  function offerMatches(offer) {
     // Category filter
     if (
       searchCategory &&
-      event._business.businessCategory &&
-      !event._business.businessCategory
+      offer._business.businessCategory &&
+      !offer._business.businessCategory
         .toLowerCase()
         .includes(searchCategory.toLowerCase())
     ) {
@@ -203,8 +150,8 @@ export default function EventsPage() {
     // Location filter
     if (
       searchLocation &&
-      event._business.businessLocation &&
-      !event._business.businessLocation
+      offer._business.businessLocation &&
+      !offer._business.businessLocation
         .toLowerCase()
         .includes(searchLocation.toLowerCase())
     ) {
@@ -213,8 +160,8 @@ export default function EventsPage() {
     // Business type filter
     if (
       searchBusinessType &&
-      event._business.businessType &&
-      !event._business.businessType
+      offer._business.businessType &&
+      !offer._business.businessType
         .toLowerCase()
         .includes(searchBusinessType.toLowerCase())
     ) {
@@ -223,13 +170,11 @@ export default function EventsPage() {
     return true;
   }
 
-  // SEARCH BUTTON HANDLER
-  function handleEventSearch() {
-    // Just triggers a re-render since we filter in render
-    setEvents((old) => [...old]);
+  function handleOfferSearch() {
+    setOffers((old) => [...old]);
   }
 
-  // Styles for card
+  // Card style
   const cardStyle = {
     marginBottom: 24,
     padding: 18,
@@ -243,7 +188,7 @@ export default function EventsPage() {
     <>
       <Navbar />
       <div style={{ maxWidth: 700, margin: "40px auto", padding: 16 }}>
-        <h1>Εκδηλώσεις</h1>
+        <h1>Προσφορές</h1>
 
         {/* MainPage-style Search Bar */}
         <div className="actions" style={{ marginBottom: 18 }}>
@@ -252,7 +197,7 @@ export default function EventsPage() {
             <input
               type="text"
               aria-label="Αναζήτηση κατηγορίας"
-              placeholder="Κατηγορία"
+              placeholder="Επιλέξτε κατηγορία ή πληκτρολογήστε..."
               value={searchCategory}
               onChange={e => setSearchCategory(e.target.value)}
               autoComplete="off"
@@ -312,7 +257,7 @@ export default function EventsPage() {
               value={searchBusinessType}
               onChange={e => setSearchBusinessType(e.target.value)}
             >
-              <option value="">Φίλτρο</option>
+              <option value="">Επιλέξτε τύπο επιχείρησης</option>
               {businessTypes.map((type, idx) => (
                 <option key={idx} value={type}>
                   {type}
@@ -324,7 +269,7 @@ export default function EventsPage() {
           <button
             className="search-icon"
             aria-label="Αναζήτηση"
-            onClick={handleEventSearch}
+            onClick={handleOfferSearch}
           >
             <svg viewBox="0 0 30 30" width="22" height="22" aria-hidden="true">
               <circle cx="14" cy="14" r="10" stroke="black" strokeWidth="2.5" fill="none" />
@@ -333,41 +278,15 @@ export default function EventsPage() {
           </button>
         </div>
 
-        {/* Date order filter */}
-        <div style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: 8
-        }}>
-          <select
-            value={dateOrder}
-            onChange={e => setDateOrder(e.target.value)}
-            style={{
-              padding: "6px 12px",
-              fontSize: 15,
-              borderRadius: 8,
-              border: "1.2px solid #191919",
-              background: "#fff",
-              color: "#191919"
-            }}
-          >
-            <option value="desc">Νεότερες πρώτα</option>
-            <option value="asc">Παλαιότερες πρώτα</option>
-          </select>
-        </div>
-
-        {/* Loading / No Events / Events */}
         {loading ? (
           <div style={{ textAlign: "center", marginTop: 80 }}>Φόρτωση...</div>
-        ) : events.filter(eventMatches).length === 0 ? (
-          <div style={{ color: "#888", textAlign: "center" }}>Δεν υπάρχουν εκδηλώσεις.</div>
+        ) : offers.filter(offerMatches).length === 0 ? (
+          <div style={{ color: "#888", textAlign: "center" }}>Δεν υπάρχουν προσφορές.</div>
         ) : (
-          events.filter(eventMatches).map((evt) => {
-            const biz = evt._business || {};
-            const going = evt.attendees?.includes(user?.uid);
-
+          offers.filter(offerMatches).map((offer) => {
+            const biz = offer._business || {};
             return (
-              <div key={evt.id} style={cardStyle}>
+              <div key={offer.id} style={cardStyle}>
                 {/* Business logo + name */}
                 <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
                   <img
@@ -401,7 +320,7 @@ export default function EventsPage() {
                       transition: "background .18s",
                     }}
                     onClick={() =>
-                      evt.businessId && window.location.assign(`/business/${evt.businessId}`)
+                      offer.businessId && window.location.assign(`/business/${offer.businessId}`)
                     }
                     onMouseEnter={e => (e.currentTarget.style.background = "#28324a")}
                     onMouseLeave={e => (e.currentTarget.style.background = "#202b40")}
@@ -409,59 +328,30 @@ export default function EventsPage() {
                     Προφίλ Επιχείρησης
                   </button>
                 </div>
-                {/* Event details */}
-                <h2 style={{ margin: "0 0 7px 0" }}>{evt.title}</h2>
-                <div style={{ color: "#777", fontSize: 15, marginBottom: 2 }}>
-                  {evt.date && (
-                    <span>
-                      <b>Ημ/νία:</b> {evt.date} &nbsp;
-                    </span>
-                  )}
-                  {evt.startTime && evt.endTime && (
-                    <span>
-                      <b>Ώρες:</b> {evt.startTime} - {evt.endTime}
-                    </span>
-                  )}
-                </div>
-                {evt.description && (
+                {/* Offer details */}
+                <h2 style={{ margin: "0 0 7px 0" }}>{offer.title}</h2>
+                {offer.description && (
                   <p style={{ fontSize: 15, color: "#555", margin: "10px 0 0 0" }}>
-                    {evt.description}
+                    {offer.description}
                   </p>
                 )}
-                <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
-                  {/* "Θα έρθω" / "Δεν θα έρθω" */}
-                  <button
-                    onClick={() => toggleGoing(evt)}
+                {offer.imageURL && (
+                  <img
+                    src={offer.imageURL}
+                    alt={offer.title}
                     style={{
-                      background: going ? "#ff4242" : "#13b36e",
-                      color: "#fff",
-                      border: "none",
+                      width: "100%",
+                      maxHeight: 220,
                       borderRadius: 8,
-                      fontWeight: 600,
-                      fontSize: 15,
-                      padding: "8px 24px",
-                      minWidth: 110,
-                      boxShadow: going
-                        ? "0 2px 9px #ff535346"
-                        : "0 2px 9px #13b36e46",
-                      cursor: "pointer",
-                      transition: "background .18s",
+                      marginTop: 8,
+                      objectFit: "cover",
                     }}
-                    onMouseEnter={e =>
-                      (e.currentTarget.style.background = going ? "#d03131" : "#0d9356")
-                    }
-                    onMouseLeave={e =>
-                      (e.currentTarget.style.background = going ? "#ff4242" : "#13b36e")
-                    }
-                  >
-                    {going ? "Δεν θα έρθω" : "Θα έρθω"}{" "}
-                    <span style={{ marginLeft: 2, fontWeight: 400, fontSize: 14 }}>
-                      ({evt.attendees?.length || 0})
-                    </span>
-                  </button>
+                  />
+                )}
+                <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
                   {/* Share button */}
                   <button
-                    onClick={() => copyLink(evt.businessId)}
+                    onClick={() => copyLink(offer.businessId)}
                     style={{
                       background: "#eee",
                       border: "none",
