@@ -170,95 +170,135 @@ export default function ResultsPage() {
           Αποτελέσματα αναζήτησης
         </h2>
 
-        <div className="actions">
-  {/* Category input (with dropdown, like main page) */}
-  <div className="input-group">
-    <input
-      type="text"
-      aria-label="Αναζήτηση κατηγορίας"
-      placeholder="Κατηγορία"
-      value={category}
-      onChange={e => {
-        setCategory(e.target.value);
-      }}
-      autoComplete="off"
-    />
-    {/* Dropdown: show only when searching, not when exact match */}
-    {category &&
-      flattenCategories()
-        .filter(
-          cat =>
-            cat.toLowerCase().includes(category.toLowerCase()) &&
-            cat.toLowerCase() !== category.toLowerCase()
-        ).length > 0 && (
-        <ul className="category-dropdown">
-          {flattenCategories()
-            .filter(
-              cat =>
-                cat.toLowerCase().includes(category.toLowerCase()) &&
-                cat.toLowerCase() !== category.toLowerCase()
-            )
-            .map((cat, idx) => (
-              <li
-                key={idx}
-                onClick={() => setCategory(cat)}
-                onMouseDown={e => e.preventDefault()}
-              >
-                {cat}
-              </li>
-            ))}
-        </ul>
-      )}
-  </div>
+        <div className="actions" style={{ gap: 20, flexWrap: "wrap" }}>
+          <div style={{ flex: "1 1 200px" }}>
+            <select
+              aria-label="Κατηγορία"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              style={{
+                padding: "14px 20px",
+                borderRadius: "40px",
+                border: "2px solid black",
+                width: "100%",
+                fontSize: 18,
+                cursor: "pointer",
+                backgroundColor: "white",
+                appearance: "none",
+                WebkitAppearance: "none",
+                MozAppearance: "none",
+              }}
+            >
+              <option value="">Επιλέξτε κατηγορία</option>
+              {flattenCategories().map((cat, idx) => (
+                <option key={idx} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
 
-  {/* Location */}
-  <div className="input-group">
-    {isLoaded ? (
-      <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
-        <input
-          type="text"
-          placeholder="Τοποθεσία"
-          value={location}
-          onChange={e => setLocation(e.target.value)}
-          aria-label="Τοποθεσία"
-        />
-      </Autocomplete>
-    ) : (
-      <input
-        type="text"
-        placeholder="Τοποθεσία"
-        value={location}
-        onChange={e => setLocation(e.target.value)}
-        aria-label="Τοποθεσία"
-      />
-    )}
-  </div>
+          <div style={{ flex: "1 1 200px" }}>
+            {isLoaded ? (
+              <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
+                <input
+                  type="text"
+                  placeholder="Τοποθεσία"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  aria-label="Τοποθεσία"
+                  style={{
+                    padding: "14px 20px",
+                    borderRadius: "40px",
+                    border: "2px solid black",
+                    width: "100%",
+                    fontSize: 18,
+                  }}
+                />
+              </Autocomplete>
+            ) : (
+              <input
+                type="text"
+                placeholder="Τοποθεσία"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                aria-label="Τοποθεσία"
+                style={{
+                  padding: "14px 20px",
+                  borderRadius: "40px",
+                  border: "2px solid black",
+                  width: "100%",
+                  fontSize: 18,
+                }}
+              />
+            )}
+          </div>
 
-  {/* Business type */}
-  <div className="input-group">
-    <select
-      aria-label="Φίλτρο τύπου επιχείρησης"
-      value={businessType}
-      onChange={e => setBusinessType(e.target.value)}
-    >
-      <option value="">Φίλτρο</option>
-      {businessTypes.map((type, idx) => (
-        <option key={idx} value={type}>
-          {type}
-        </option>
-      ))}
-    </select>
-  </div>
+          <div style={{ flex: "1 1 200px" }}>
+            <select
+              aria-label="Φίλτρο τύπου επιχείρησης"
+              value={businessType}
+              onChange={(e) => setBusinessType(e.target.value)}
+              style={{
+                padding: "14px 20px",
+                borderRadius: "40px",
+                border: "2px solid black",
+                width: "100%",
+                fontSize: 18,
+                cursor: "pointer",
+                backgroundColor: "white",
+                appearance: "none",
+                WebkitAppearance: "none",
+                MozAppearance: "none",
+              }}
+            >
+              <option value="">Επιλέξτε τύπο επιχείρησης</option>
+              {businessTypes.map((type, idx) => (
+                <option key={idx} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </div>
 
-  {/* Search icon */}
-  <button className="search-icon" aria-label="Αναζήτηση" onClick={onSearch}>
-    <svg viewBox="0 0 30 30" width="22" height="22" aria-hidden="true">
-      <circle cx="14" cy="14" r="10" stroke="black" strokeWidth="2.5" fill="none" />
-      <line x1="26" y1="26" x2="20" y2="20" stroke="black" strokeWidth="2.5" />
-    </svg>
-  </button>
-</div>
-
+          <button
+            className="search-icon"
+            aria-label="Αναζήτηση"
+            onClick={onSearch}
+            style={{
+              width: 54,
+              height: 54,
+              borderRadius: "50%",
+              border: "2px solid black",
+              backgroundColor: "white",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              marginLeft: 8,
+            }}
+          >
+            <svg viewBox="0 0 30 30" width="28" height="28" aria-hidden="true">
+              <circle
+                cx="14"
+                cy="14"
+                r="10"
+                stroke="black"
+                strokeWidth="2.5"
+                fill="none"
+              />
+              <line
+                x1="26"
+                y1="26"
+                x2="20"
+                y2="20"
+                stroke="black"
+                strokeWidth="2.5"
+              />
+            </svg>
+          </button>
+        </div>
 
         {loading ? (
           <div style={{ textAlign: "center", marginTop: 70, flexGrow: 1 }}>

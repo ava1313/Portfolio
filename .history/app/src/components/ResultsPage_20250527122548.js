@@ -176,7 +176,7 @@ export default function ResultsPage() {
     <input
       type="text"
       aria-label="Αναζήτηση κατηγορίας"
-      placeholder="Κατηγορία"
+      placeholder="Επιλέξτε κατηγορία ή πληκτρολογήστε..."
       value={category}
       onChange={e => {
         setCategory(e.target.value);

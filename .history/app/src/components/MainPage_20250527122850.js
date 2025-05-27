@@ -127,7 +127,7 @@ export default function MainPage() {
   <input
     type="text"
     aria-label="Αναζήτηση κατηγορίας"
-    placeholder="Κατηγορία"
+    placeholder="Επιλέξτε κατηγορία"
     value={categoryInput}
     onChange={(e) => {
       setCategoryInput(e.target.value);

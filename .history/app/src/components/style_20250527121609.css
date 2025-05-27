@@ -118,9 +118,10 @@ main {
     margin-top: 42px;
     margin-bottom: 40px;
     flex-wrap: wrap;
-    background: #ffffff;
+    background: #fafbfc;
     padding: 20px 28px 16px 28px;
     border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
     width: 100%;
     max-width: 680px;
     margin-left: auto;
@@ -167,7 +168,7 @@ main {
     background: #fff;
     border: 1.2px solid #333;
     border-top: none;
-    border-radius: 0 0 20px 20px;
+    border-radius: 0 0 8px 8px;
     box-shadow: 0 2px 7px rgba(0,0,0,0.09);
     z-index: 1000;
     padding: 0;
@@ -181,8 +182,6 @@ main {
     cursor: pointer;
     transition: background 0.09s;
     font-family: 'EB Garamond', serif;
- 
-
 }
 .category-dropdown li:hover {
     background: #f1f4fa;
@@ -193,7 +192,7 @@ main {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    border: 2px solid #222;
+    border: 1.2px solid #222;
     background: #fff;
     display: flex;
     align-items: center;
@@ -203,7 +202,7 @@ main {
     transition: border-color 0.16s, box-shadow 0.16s;
 }
 .search-icon:active, .search-icon:hover {
-    border-color: #000000;
+    border-color: #4e5cff;
     box-shadow: 0 2px 6px rgba(44,68,255,0.10);
 }
 

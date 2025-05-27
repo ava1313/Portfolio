@@ -176,7 +176,7 @@ export default function ResultsPage() {
     <input
       type="text"
       aria-label="Αναζήτηση κατηγορίας"
-      placeholder="Κατηγορία"
+      placeholder="Επιλέξτε κατηγορία ή πληκτρολογήστε..."
       value={category}
       onChange={e => {
         setCategory(e.target.value);
@@ -241,7 +241,7 @@ export default function ResultsPage() {
       value={businessType}
       onChange={e => setBusinessType(e.target.value)}
     >
-      <option value="">Φίλτρο</option>
+      <option value="">Επιλέξτε τύπο επιχείρησης</option>
       {businessTypes.map((type, idx) => (
         <option key={idx} value={type}>
           {type}

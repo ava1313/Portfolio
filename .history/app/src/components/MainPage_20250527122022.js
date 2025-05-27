@@ -123,38 +123,32 @@ export default function MainPage() {
 
         <div className="actions">
   {/* Category */}
-<div className="input-group">
-  <input
-    type="text"
-    aria-label="Αναζήτηση κατηγορίας"
-    placeholder="Κατηγορία"
-    value={categoryInput}
-    onChange={(e) => {
-      setCategoryInput(e.target.value);
-      setSelectedCategory(""); // Clear selection on typing
-    }}
-    autoComplete="off"
-  />
-  {categoryInput &&
-    categoryInput !== selectedCategory &&
-    filteredCategories.length > 0 && (
+  <div className="input-group">
+    <input
+      type="text"
+      aria-label="Αναζήτηση κατηγορίας"
+      placeholder="Επιλέξτε κατηγορία "
+      value={categoryInput}
+      onChange={(e) => {
+        setCategoryInput(e.target.value);
+        setSelectedCategory("");
+      }}
+      autoComplete="off"
+    />
+    {categoryInput && filteredCategories.length > 0 && (
       <ul className="category-dropdown">
         {filteredCategories.map((cat, idx) => (
           <li
             key={idx}
-            onClick={() => {
-              setSelectedCategory(cat);
-              setCategoryInput(cat); // Set as input value
-            }}
-            onMouseDown={e => e.preventDefault()} // Prevent blur on click
+            onClick={() => onCategoryChange(cat)}
+            onMouseDown={(e) => e.preventDefault()}
           >
             {cat}
           </li>
         ))}
       </ul>
     )}
-</div>
-
+  </div>
 
   {/* Location */}
   <div className="input-group">
@@ -186,7 +180,7 @@ export default function MainPage() {
       value={businessType}
       onChange={(e) => setBusinessType(e.target.value)}
     >
-      <option value="">Φίλτρο	</option>
+      <option value="">Επιλέξτε τύπο επιχείρησης</option>
       {businessTypes.map((type, idx) => (
         <option key={idx} value={type}>{type}</option>
       ))}
