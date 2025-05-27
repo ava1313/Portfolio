@@ -313,17 +313,17 @@ main {
 @media (max-width: 700px) {
     .logo { height: 30px; }
     .subtitle {
-        font-size: 14px;
+        font-size: 12px;
         margin: 7px 0 7px 0;
     }
     .trust-counts {
-        font-size: 16px;
-        margin-top: 50px;
+        font-size: 14px;
+        margin-top: 13px;
         margin-bottom: 4px;
     }
     .actions {
         
-        gap: 4px;
+        gap: 2px;
         align-items: stretch;
         padding: 10px 2vw 10px 2vw;
         border-radius: 40px;
@@ -358,9 +358,7 @@ main {
     .carousel img {
         width: 41vw !important;
         min-width: 41vw !important;
-        margin-left: 2px;
-        margin-right: 2px;
-        border-radius: 8px;
+        margin-left: 5px;
     }
     .carousel-btn {
         width: 24px !important;

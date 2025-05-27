@@ -323,7 +323,7 @@ main {
     }
     .actions {
         
-        gap: 4px;
+        gap: 2px;
         align-items: stretch;
         padding: 10px 2vw 10px 2vw;
         border-radius: 40px;
