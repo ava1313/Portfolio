@@ -779,7 +779,7 @@ const REVIEWS_LIMIT = 3;
                 if (!submittingReview) e.currentTarget.style.backgroundColor = "#191919";
               }}
             >
-              {submittingReview ? "Αποστολή..." : "Υποβολή Σχολίου"}
+              {submittingReview ? "Αποστολή..." : "Υποβολή Κριτικής"}
             </button>
           </form>
         )}
@@ -796,7 +796,7 @@ const REVIEWS_LIMIT = 3;
     }}
   >
     <h3 style={{ marginBottom: 16, fontWeight: 700, fontSize: 22 }}>
-      Σχόλια Χρηστών
+      Κριτικές Χρηστών
     </h3>
     {(showAllReviews ? reviews : reviews.slice(0, REVIEWS_LIMIT)).map((review) => (
       <div

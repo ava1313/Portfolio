@@ -17,9 +17,6 @@ import { useGoogleMaps } from "./GoogleMapsLoader";
 import Navbar from "./Navbar";
 import "./style.css";
 
-
-
-
 function PopupModal({ open, title, message, onClose, onConfirm, confirmText = "OK", cancelText }) {
   if (!open) return null;
 
@@ -88,9 +85,6 @@ function PopupModal({ open, title, message, onClose, onConfirm, confirmText = "O
 }
 
 export default function BusinessPage() {
-  const [showAllReviews, setShowAllReviews] = useState(false);
-const REVIEWS_LIMIT = 3;
-
   const { id } = useParams();
   const navigate = useNavigate();
   const { isLoaded } = useGoogleMaps();
@@ -248,48 +242,22 @@ const REVIEWS_LIMIT = 3;
 
   // Toggle favorite business
   const toggleFavorite = async () => {
-  const user = auth.currentUser;
-  if (!user) {
-    showAlert("Προσοχή", "Πρέπει να είστε συνδεδεμένος για να προσθέσετε στα αγαπημένα.");
-    return;
-  }
-  const userRef = doc(db, "users", user.uid);
-  let updatedFavorites;
-
-  // Βρες username ή χρήση uid
-  let username = user.uid;
-  const userDoc = await getDoc(userRef);
-  if (userDoc.exists() && userDoc.data().profile && userDoc.data().profile.username) {
-    username = userDoc.data().profile.username;
-  }
-
-  if (favorites.includes(id)) {
-    updatedFavorites = favorites.filter((fid) => fid !== id);
-    await updateDoc(userRef, { favorites: updatedFavorites });
-
-    // Ειδοποίηση αφαίρεσης
-    await addDoc(collection(db, "users", id, "notifications"), {
-      type: "unfavorite",
-      userId: user.uid,
-      username,
-      timestamp: new Date(),
-      read: false,
-    });
-  } else {
-    updatedFavorites = [...favorites, id];
-    await updateDoc(userRef, { favorites: updatedFavorites });
-
-    // Ειδοποίηση προσθήκης
-    await addDoc(collection(db, "users", id, "notifications"), {
-      type: "favorite",
-      userId: user.uid,
-      username,
-      timestamp: new Date(),
-      read: false,
-    });
-  }
-  setFavorites(updatedFavorites);
-};
+    const user = auth.currentUser;
+    if (!user) {
+      showAlert("Προσοχή", "Πρέπει να είστε συνδεδεμένος για να προσθέσετε στα αγαπημένα.");
+      return;
+    }
+    const userRef = doc(db, "users", user.uid);
+    let updatedFavorites;
+    if (favorites.includes(id)) {
+      updatedFavorites = favorites.filter((fid) => fid !== id);
+      await updateDoc(userRef, { favorites: updatedFavorites });
+    } else {
+      updatedFavorites = [...favorites, id];
+      await updateDoc(userRef, { favorites: updatedFavorites });
+    }
+    setFavorites(updatedFavorites);
+  };
 
   // Delete item with modal confirmation
   const deleteItem = (type, itemId) => {
@@ -318,59 +286,40 @@ const REVIEWS_LIMIT = 3;
 
   // Submit review with modal alerts
   const submitReview = async (e) => {
-  e.preventDefault();
-  if (!auth.currentUser) {
-    showAlert("Προσοχή", "Πρέπει να είστε συνδεδεμένος για να αφήσετε σχόλιο.");
-    return;
-  }
-  if (!newReview.comment.trim()) {
-    showAlert("Προσοχή", "Παρακαλώ γράψτε κάποιο σχόλιο.");
-    return;
-  }
-  setSubmittingReview(true);
-  try {
-    const reviewsCol = collection(db, "users", id, "reviews");
-    // Βρες username ή χρήση uid
-    let username = auth.currentUser.uid;
-    const userRef = doc(db, "users", auth.currentUser.uid);
-    const userDoc = await getDoc(userRef);
-    if (userDoc.exists() && userDoc.data().profile && userDoc.data().profile.username) {
-      username = userDoc.data().profile.username;
+    e.preventDefault();
+    if (!auth.currentUser) {
+      showAlert("Προσοχή", "Πρέπει να είστε συνδεδεμένος για να αφήσετε κριτική.");
+      return;
     }
-    // Πρόσθεσε κριτική
-    await addDoc(reviewsCol, {
-      userId: auth.currentUser.uid,
-      userName: auth.currentUser.displayName || username || "Anonymous",
-      rating: Number(newReview.rating),
-      comment: newReview.comment.trim(),
-      timestamp: new Date(),
-    });
-
-    // Ειδοποίηση review
-    await addDoc(collection(db, "users", id, "notifications"), {
-      type: "review",
-      userId: auth.currentUser.uid,
-      username,
-      timestamp: new Date(),
-      read: false,
-    });
-
-    setNewReview({ rating: 5, comment: "" });
-    // Refresh reviews
-    const q = query(reviewsCol, orderBy("timestamp", "desc"));
-    const querySnapshot = await getDocs(q);
-    const fetchedReviews = [];
-    querySnapshot.forEach((doc) => {
-      fetchedReviews.push({ id: doc.id, ...doc.data() });
-    });
-    setReviews(fetchedReviews);
-  } catch (error) {
-    showAlert("Σφάλμα", "Σφάλμα κατά την αποστολή του σχολίου.");
-    console.error("Error submitting review:", error);
-  }
-  setSubmittingReview(false);
-};
-
+    if (!newReview.comment.trim()) {
+      showAlert("Προσοχή", "Παρακαλώ γράψτε κάποιο σχόλιο.");
+      return;
+    }
+    setSubmittingReview(true);
+    try {
+      const reviewsCol = collection(db, "users", id, "reviews");
+      await addDoc(reviewsCol, {
+        userId: auth.currentUser.uid,
+        userName: auth.currentUser.displayName || "Anonymous",
+        rating: Number(newReview.rating),
+        comment: newReview.comment.trim(),
+        timestamp: new Date(),
+      });
+      setNewReview({ rating: 5, comment: "" });
+      // Refresh reviews
+      const q = query(reviewsCol, orderBy("timestamp", "desc"));
+      const querySnapshot = await getDocs(q);
+      const fetchedReviews = [];
+      querySnapshot.forEach((doc) => {
+        fetchedReviews.push({ id: doc.id, ...doc.data() });
+      });
+      setReviews(fetchedReviews);
+    } catch (error) {
+      showAlert("Σφάλμα", "Σφάλμα κατά την αποστολή της κριτικής.");
+      console.error("Error submitting review:", error);
+    }
+    setSubmittingReview(false);
+  };
 
   if (loading)
     return (
@@ -711,7 +660,7 @@ const REVIEWS_LIMIT = 3;
               gap: 12,
             }}
           >
-            <h3 style={{ fontWeight: 700, fontSize: 22 }}>Αφήστε Σχόλιο</h3>
+            <h3 style={{ fontWeight: 700, fontSize: 22 }}>Αφήστε Κριτική</h3>
 
             <label>
               Rating:
@@ -751,7 +700,7 @@ const REVIEWS_LIMIT = 3;
                   width: "100%",
                   boxSizing: "border-box",
                 }}
-                placeholder="Γράψτε το σχόλιο σας εδώ..."
+                placeholder="Γράψτε την κριτική σας εδώ..."
                 required
               />
             </label>
@@ -779,103 +728,60 @@ const REVIEWS_LIMIT = 3;
                 if (!submittingReview) e.currentTarget.style.backgroundColor = "#191919";
               }}
             >
-              {submittingReview ? "Αποστολή..." : "Υποβολή Σχολίου"}
+              {submittingReview ? "Αποστολή..." : "Υποβολή Κριτικής"}
             </button>
           </form>
         )}
 
         {/* Existing Reviews */}
         {reviews.length > 0 && (
-  <div
-    style={{
-      maxWidth: 600,
-      width: "100%",
-      marginBottom: 40,
-      marginLeft: "auto",
-      marginRight: "auto",
-    }}
-  >
-    <h3 style={{ marginBottom: 16, fontWeight: 700, fontSize: 22 }}>
-      Σχόλια Χρηστών
-    </h3>
-    {(showAllReviews ? reviews : reviews.slice(0, REVIEWS_LIMIT)).map((review) => (
-      <div
-        key={review.id}
-        style={{
-          marginBottom: 20,
-          padding: 12,
-          borderRadius: 12,
-          backgroundColor: "#f6f8fc",
-          boxShadow: "0 1px 6px rgba(0,0,0,0.1)",
-        }}
-      >
-        <div
-          style={{
-            fontWeight: 700,
-            marginBottom: 6,
-            fontSize: 16,
-            color: "#232323",
-          }}
-        >
-          {review.userName}
-        </div>
-        <div style={{ marginBottom: 6 }}>
-          {"⭐".repeat(review.rating)}{" "}
-          <span style={{ color: "#888" }}>
-            -{" "}
-            {review.timestamp
-              ? new Date(review.timestamp.seconds * 1000).toLocaleDateString()
-              : ""}
-          </span>
-        </div>
-        <div style={{ fontSize: 15, color: "#555" }}>{review.comment}</div>
-      </div>
-    ))}
-
-    {reviews.length > REVIEWS_LIMIT && (
-      <div style={{ textAlign: "center", marginTop: 10 }}>
-        {!showAllReviews ? (
-          <button
+          <div
             style={{
-              padding: "9px 32px",
-              borderRadius: 14,
-              background: "#ededed",
-              color: "#222",
-              border: "none",
-              fontWeight: 600,
-              fontSize: 16,
-              cursor: "pointer",
-              marginTop: 2,
-              marginBottom: 10,
+              maxWidth: 600,
+              width: "100%",
+              marginBottom: 40,
+              marginLeft: "auto",
+              marginRight: "auto",
             }}
-            onClick={() => setShowAllReviews(true)}
           >
-            Δείτε περισσότερα σχόλια
-          </button>
-        ) : (
-          <button
-            style={{
-              padding: "9px 32px",
-              borderRadius: 14,
-              background: "#ededed",
-              color: "#222",
-              border: "none",
-              fontWeight: 600,
-              fontSize: 16,
-              cursor: "pointer",
-              marginTop: 2,
-              marginBottom: 10,
-            }}
-            onClick={() => setShowAllReviews(false)}
-          >
-            Δες λιγότερα
-          </button>
+            <h3 style={{ marginBottom: 16, fontWeight: 700, fontSize: 22 }}>
+              Κριτικές Χρηστών
+            </h3>
+            {reviews.map((review) => (
+              <div
+                key={review.id}
+                style={{
+                  marginBottom: 20,
+                  padding: 12,
+                  borderRadius: 12,
+                  backgroundColor: "#f6f8fc",
+                  boxShadow: "0 1px 6px rgba(0,0,0,0.1)",
+                }}
+              >
+                <div
+                  style={{
+                    fontWeight: 700,
+                    marginBottom: 6,
+                    fontSize: 16,
+                    color: "#232323",
+                  }}
+                >
+                  {review.userName}
+                </div>
+                <div style={{ marginBottom: 6 }}>
+                  {"⭐".repeat(review.rating)}{" "}
+                  <span style={{ color: "#888" }}>
+                    -{" "}
+                    {review.timestamp
+                      ? new Date(review.timestamp.seconds * 1000).toLocaleDateString()
+                      : ""}
+                  </span>
+                </div>
+                <div style={{ fontSize: 15, color: "#555" }}>{review.comment}</div>
+              </div>
+            ))}
+          </div>
         )}
-      </div>
-    )}
-  </div>
-)}
-
 
         {/* --- EVENTS SECTION --- */}
         {events.length > 0 && (

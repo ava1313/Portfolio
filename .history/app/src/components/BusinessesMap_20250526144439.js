@@ -2,22 +2,9 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import Navbar from "./Navbar";
+import { useGoogleMaps } from "./GoogleMapsLoader";
 import { useNavigate } from "react-router-dom";
-import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
-import categories from "../data/categories";
 
-const flattenCategories = () =>
-  categories.flatMap((cat) => [cat.name, ...(cat.subcategories || [])]);
-
-const businessTypes = [
-  "Απλή Επιχείρηση",
-  "Κυριλέ Επιχείρηση",
-  "Εμπορική Επιχείρηση",
-  "Νεοφυής Επιχείρηση",
-  "Άλλη",
-];
-
-const libraries = ["places"];
 const mapContainerStyle = {
   width: "100%",
   height: "80vh",
@@ -27,36 +14,53 @@ const mapContainerStyle = {
   boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
 };
 
+const buttonBaseStyle = {
+  padding: "8px 16px",
+  fontSize: 16,
+  cursor: "pointer",
+  borderRadius: 8,
+  border: "none",
+  fontWeight: 600,
+  transition: "background-color 0.3s ease",
+  userSelect: "none",
+  boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+};
+
+const primaryButtonStyle = {
+  ...buttonBaseStyle,
+  backgroundColor: "#191919",
+  color: "#fff",
+};
+
+const secondaryButtonStyle = {
+  ...buttonBaseStyle,
+  backgroundColor: "#f0f0f0",
+  color: "#191919",
+};
+
+const selectStyle = {
+  padding: "8px 12px",
+  fontSize: 16,
+  borderRadius: 8,
+  border: "1px solid #ccc",
+  boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+  cursor: "pointer",
+  userSelect: "none",
+  outline: "none",
+  minWidth: 140,
+};
+
 export default function BusinessesMap() {
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-    libraries,
-  });
+  const { isLoaded } = useGoogleMaps();
   const navigate = useNavigate();
 
-  // Main search bar states
   const [businesses, setBusinesses] = useState([]);
-  const [categoryInput, setCategoryInput] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [locationInput, setLocationInput] = useState("");
-  const [businessType, setBusinessType] = useState("");
-  const autocompleteRef = useRef(null);
-
-  // Map state
+  const [filteredBusinesses, setFilteredBusinesses] = useState([]);
+  const [filterCategory, setFilterCategory] = useState("");
   const [map, setMap] = useState(null);
-  const [center, setCenter] = useState({ lat: 37.9838, lng: 23.7275 }); // Default: Athens
+  const [center, setCenter] = useState({ lat: 37.9838, lng: 23.7275 });
   const [userPosition, setUserPosition] = useState(null);
 
-  // Category dropdown logic
-  const allCategories = flattenCategories();
-  const filteredCategories =
-    categoryInput.trim() === ""
-      ? []
-      : allCategories.filter((cat) =>
-          cat.toLowerCase().includes(categoryInput.toLowerCase())
-        );
-
-  // Fetch businesses from Firestore
   useEffect(() => {
     async function fetchBusinesses() {
       const snapshot = await getDocs(collection(db, "users"));
@@ -71,44 +75,29 @@ export default function BusinessesMap() {
         }
       });
       setBusinesses(bizs);
+      setFilteredBusinesses(bizs);
     }
     fetchBusinesses();
   }, []);
 
-  // Filtering logic
-  const filteredBusinesses = businesses.filter((b) => {
-    let match = true;
-    if (selectedCategory && b.businessCategory) {
-      match =
-        match &&
-        b.businessCategory.toLowerCase().includes(selectedCategory.toLowerCase());
+  useEffect(() => {
+    if (!filterCategory) {
+      setFilteredBusinesses(businesses);
+      return;
     }
-    if (locationInput && b.businessLocation) {
-      match =
-        match &&
-        b.businessLocation.toLowerCase().includes(locationInput.toLowerCase());
-    }
-    if (businessType && b.businessType) {
-      match =
-        match &&
-        b.businessType.toLowerCase().includes(businessType.toLowerCase());
-    }
-    return match;
-  });
+    setFilteredBusinesses(
+      businesses.filter(
+        (b) =>
+          b.businessCategory &&
+          b.businessCategory.toLowerCase() === filterCategory.toLowerCase()
+      )
+    );
+  }, [filterCategory, businesses]);
 
-  // Google Maps autocomplete
-  const onLoad = (autocomplete) => {
-    autocompleteRef.current = autocomplete;
-  };
-  const onPlaceChanged = () => {
-    if (autocompleteRef.current) {
-      const place = autocompleteRef.current.getPlace();
-      const address = place.formatted_address || place.name || "";
-      setLocationInput(address);
-    }
-  };
+  const onLoad = useCallback((mapInstance) => {
+    setMap(mapInstance);
+  }, []);
 
-  // Center map to user location
   const centerOnUser = () => {
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser.");
@@ -132,6 +121,17 @@ export default function BusinessesMap() {
       }
     );
   };
+
+  if (!isLoaded) {
+    return (
+      <>
+        <Navbar />
+        <div style={{ textAlign: "center", marginTop: 80, fontSize: 18 }}>
+          Loading map...
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -157,102 +157,45 @@ export default function BusinessesMap() {
           Επιχειρήσεις στον Χάρτη
         </h2>
 
-        {/* Mainpage-style Search Bar */}
+        {/* Filter controls */}
         <div
-          className="actions"
           style={{
-            marginBottom: 18,
-            gap: 16,
+            marginBottom: 20,
+            textAlign: "center",
             display: "flex",
-            flexWrap: "wrap",
-            alignItems: "flex-end",
             justifyContent: "center",
+            alignItems: "center",
+            gap: 16,
+            flexWrap: "wrap",
           }}
         >
-          {/* Category input */}
-          <div className="input-group" style={{ minWidth: 160 }}>
-            <input
-              type="text"
-              aria-label="Αναζήτηση κατηγορίας"
-              placeholder="Κατηγορία"
-              value={categoryInput}
-              onChange={(e) => {
-                setCategoryInput(e.target.value);
-                setSelectedCategory(""); // clear selection on typing
-              }}
-              autoComplete="off"
-            />
-            {categoryInput && filteredCategories.length > 0 && (
-              <ul className="category-dropdown">
-                {filteredCategories.map((cat, idx) => (
-                  <li
-                    key={idx}
-                    onClick={() => {
-                      setSelectedCategory(cat);
-                      setCategoryInput(cat);
-                    }}
-                    onMouseDown={(e) => e.preventDefault()}
-                  >
-                    {cat}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-          {/* Location input */}
-          <div className="input-group" style={{ minWidth: 160 }}>
-            {isLoaded ? (
-              <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
-                <input
-                  type="text"
-                  placeholder="Τοποθεσία"
-                  value={locationInput}
-                  onChange={(e) => setLocationInput(e.target.value)}
-                  aria-label="Τοποθεσία"
-                />
-              </Autocomplete>
-            ) : (
-              <input
-                type="text"
-                placeholder="Τοποθεσία"
-                value={locationInput}
-                onChange={(e) => setLocationInput(e.target.value)}
-                aria-label="Τοποθεσία"
-              />
-            )}
-          </div>
-          {/* Business type dropdown */}
-          <div className="input-group" style={{ minWidth: 160 }}>
-            <select
-              aria-label="Φίλτρο τύπου επιχείρησης"
-              value={businessType}
-              onChange={(e) => setBusinessType(e.target.value)}
-            >
-              <option value="">Φίλτρο</option>
-              {businessTypes.map((type, idx) => (
-                <option key={idx} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          </div>
-          {/* Center on user */}
-          <button
-            onClick={centerOnUser}
+          <label
+            htmlFor="categoryFilter"
             style={{
-              padding: "8px 16px",
               fontSize: 16,
-              cursor: "pointer",
-              borderRadius: 8,
-              border: "none",
               fontWeight: 600,
-              transition: "background-color 0.3s ease",
               userSelect: "none",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-              backgroundColor: "#191919",
-              color: "#fff",
             }}
           >
+            Φιλτράρισμα κατά κατηγορία:
+          </label>
+          <select
+            id="categoryFilter"
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            style={selectStyle}
+          >
+            <option value="">Όλες</option>
+            {[...new Set(businesses.map((b) => b.businessCategory))].map(
+              (cat) =>
+                cat && (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                )
+            )}
+          </select>
+          <button onClick={centerOnUser} style={primaryButtonStyle}>
             Η τοποθεσία μου
           </button>
         </div>
@@ -262,7 +205,7 @@ export default function BusinessesMap() {
           <MapComponent
             businesses={filteredBusinesses}
             center={center}
-            onLoad={setMap}
+            onLoad={onLoad}
             map={map}
             userPosition={userPosition}
             navigate={navigate}
@@ -273,13 +216,12 @@ export default function BusinessesMap() {
   );
 }
 
-// === MapComponent: All logic as you had it (unchanged) ===
 function MapComponent({ businesses, center, onLoad, map, userPosition, navigate }) {
   const mapRef = useRef(null);
   const markersRef = useRef([]);
   const infoWindowRef = useRef(null);
 
-  // Throttle requests to avoid hitting Google API limits
+  // Throttle requests to avoid hitting Google API limits (max ~10 per sec)
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
   useEffect(() => {
@@ -296,17 +238,16 @@ function MapComponent({ businesses, center, onLoad, map, userPosition, navigate 
     const geocoder = new window.google.maps.Geocoder();
     const placesService = new window.google.maps.places.PlacesService(mapRef.current);
 
-    // Helper for star rating HTML
+    // Helper to create star rating HTML with inline SVG stars
     const getStarsHTML = (rating) => {
-      if (!rating)
-        return "<div style='color:#999;font-size:14px;'>No rating</div>";
+      if (!rating) return "<div style='color:#999;font-size:14px;'>No rating</div>";
       const fullStars = Math.floor(rating);
       const halfStar = rating - fullStars >= 0.5;
       let html = '<div style="display:flex;gap:2px;">';
-      const fullStarSVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="#FFC107"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
-      const emptyStarSVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFC107" stroke-width="2" stroke-linejoin="round"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+      const fullStarSVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="#FFC107" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+      const emptyStarSVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFC107" stroke-width="2" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
       for (let i = 0; i < fullStars; i++) html += fullStarSVG;
-      if (halfStar) html += emptyStarSVG;
+      if (halfStar) html += emptyStarSVG; // use half star SVG here if you want
       for (let i = fullStars + (halfStar ? 1 : 0); i < 5; i++) html += emptyStarSVG;
       html += "</div>";
       return html;
@@ -324,8 +265,7 @@ function MapComponent({ businesses, center, onLoad, map, userPosition, navigate 
       contentDiv.style.alignItems = "center";
       contentDiv.style.gap = "12px";
       contentDiv.style.minWidth = "220px";
-      contentDiv.style.fontFamily =
-        "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+      contentDiv.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
 
       if (biz.businessLogo) {
         const img = document.createElement("img");
@@ -377,14 +317,10 @@ function MapComponent({ businesses, center, onLoad, map, userPosition, navigate 
       try {
         // Geocode the address
         const geocodeResult = await new Promise((resolve, reject) =>
-          geocoder.geocode(
-            { address: biz.businessLocation },
-            (results, status) => {
-              if (status === "OK" && results[0])
-                resolve(results[0].geometry.location);
-              else reject(status);
-            }
-          )
+          geocoder.geocode({ address: biz.businessLocation }, (results, status) => {
+            if (status === "OK" && results[0]) resolve(results[0].geometry.location);
+            else reject(status);
+          })
         );
 
         // Get rating by placeId if available or by findPlaceFromQuery
@@ -395,9 +331,7 @@ function MapComponent({ businesses, center, onLoad, map, userPosition, navigate 
             placesService.getDetails(
               { placeId: biz.placeId, fields: ["rating"] },
               (place, status) => {
-                if (
-                  status === window.google.maps.places.PlacesServiceStatus.OK
-                ) {
+                if (status === window.google.maps.places.PlacesServiceStatus.OK) {
                   resolve(place.rating);
                 } else {
                   resolve(null);

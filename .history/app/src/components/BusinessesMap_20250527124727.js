@@ -224,11 +224,11 @@ export default function BusinessesMap() {
           {/* Business type dropdown */}
           <div className="input-group" style={{ minWidth: 160 }}>
             <select
-              aria-label="Φίλτρο τύπου επιχείρησης"
+              aria-label="Φίλτρο"
               value={businessType}
               onChange={(e) => setBusinessType(e.target.value)}
             >
-              <option value="">Φίλτρο</option>
+              <option value="">Επιλέξτε τύπο επιχείρησης</option>
               {businessTypes.map((type, idx) => (
                 <option key={idx} value={type}>
                   {type}

@@ -138,7 +138,7 @@ export default function ResultsPage() {
   const userRef = doc(db, "users", user.uid);
   let updatedFavorites;
 
-  // Φέρε το username του χρήστη (αν υπάρχει)
+  // Φέρε το username (αν υπάρχει)
   let username = user.uid;
   const userDoc = await getDoc(userRef);
   if (userDoc.exists() && userDoc.data().profile && userDoc.data().profile.username) {
@@ -146,25 +146,14 @@ export default function ResultsPage() {
   }
 
   if (favorites.includes(bizId)) {
-    // ΑΦΑΙΡΕΣΗ από αγαπημένα
     updatedFavorites = favorites.filter((id) => id !== bizId);
     await updateDoc(userRef, { favorites: arrayRemove(bizId) });
-
-    // Ειδοποίηση αφαίρεσης
-    await addDoc(collection(db, "users", bizId, "notifications"), {
-      type: "unfavorite",
-      userId: user.uid,
-      username,
-      timestamp: new Date(), // ή serverTimestamp()
-      read: false,
-    });
-
+    // Δεν χρειάζεται notification όταν αφαιρείς από τα αγαπημένα
   } else {
-    // ΠΡΟΣΘΗΚΗ στα αγαπημένα
     updatedFavorites = [...favorites, bizId];
     await updateDoc(userRef, { favorites: arrayUnion(bizId) });
 
-    // Ειδοποίηση προσθήκης
+    // Στέλνεις notification στον επιχειρηματία
     await addDoc(collection(db, "users", bizId, "notifications"), {
       type: "favorite",
       userId: user.uid,

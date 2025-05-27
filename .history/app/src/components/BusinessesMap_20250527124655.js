@@ -174,7 +174,7 @@ export default function BusinessesMap() {
             <input
               type="text"
               aria-label="Αναζήτηση κατηγορίας"
-              placeholder="Κατηγορία"
+              placeholder="Επιλέξτε κατηγορία ή πληκτρολογήστε..."
               value={categoryInput}
               onChange={(e) => {
                 setCategoryInput(e.target.value);
@@ -228,7 +228,7 @@ export default function BusinessesMap() {
               value={businessType}
               onChange={(e) => setBusinessType(e.target.value)}
             >
-              <option value="">Φίλτρο</option>
+              <option value="">Επιλέξτε τύπο επιχείρησης</option>
               {businessTypes.map((type, idx) => (
                 <option key={idx} value={type}>
                   {type}

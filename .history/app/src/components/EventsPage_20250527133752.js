@@ -166,56 +166,45 @@ export default function EventsPage() {
 
   // TOGGLE GOING & NOTIFY BUSINESS
   const toggleGoing = async (evt) => {
-  if (!user)
-    return showToast("Πρέπει να είστε συνδεδεμένος για να δηλώσετε συμμετοχή.", "error");
-  const ref = doc(db, "events", evt.id);
-  const currentAttendees = evt.attendees || [];
-  const isGoing = currentAttendees.includes(user.uid);
+    if (!user)
+      return showToast("Πρέπει να είστε συνδεδεμένος για να δηλώσετε συμμετοχή.", "error");
+    const ref = doc(db, "events", evt.id);
+    const currentAttendees = evt.attendees || [];
+    const isGoing = currentAttendees.includes(user.uid);
 
-  try {
-    await updateDoc(ref, {
-      attendees: isGoing ? arrayRemove(user.uid) : arrayUnion(user.uid),
-    });
+    try {
+      await updateDoc(ref, {
+        attendees: isGoing ? arrayRemove(user.uid) : arrayUnion(user.uid),
+      });
+      setEvents((es) =>
+        es.map((e) =>
+          e.id === evt.id
+            ? {
+                ...e,
+                attendees: isGoing
+                  ? currentAttendees.filter((u) => u !== user.uid)
+                  : [...currentAttendees, user.uid],
+              }
+            : e
+        )
+      );
 
-    // Φέρε το username του χρήστη
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-    let username = user.uid;
-    if (userDoc.exists() && userDoc.data().profile && userDoc.data().profile.username) {
-      username = userDoc.data().profile.username;
+      // Send notification to business ONLY when joining
+      if (!isGoing) {
+        await sendGoingNotification(evt, user);
+      }
+
+      showToast(
+        isGoing
+          ? "Δηλώσατε ότι δεν θα έρθετε."
+          : "Δηλώσατε συμμετοχή στην εκδήλωση!",
+        "success"
+      );
+    } catch (error) {
+      console.error("Error updating attendance:", error);
+      showToast("Σφάλμα κατά την ενημέρωση της συμμετοχής.", "error");
     }
-
-    // Στείλε notification και για τα δύο (θα έρθει, δεν θα έρθει)
-    await addDoc(collection(db, "users", evt.businessId, "notifications"), {
-      type: isGoing ? "not-going" : "going", // <== ανάλογα
-      userId: user.uid,
-      username,
-      timestamp: new Date(), // ή serverTimestamp()
-      read: false,
-    });
-
-    setEvents((es) =>
-      es.map((e) =>
-        e.id === evt.id
-          ? {
-              ...e,
-              attendees: isGoing
-                ? currentAttendees.filter((u) => u !== user.uid)
-                : [...currentAttendees, user.uid],
-            }
-          : e
-      )
-    );
-    showToast(
-      isGoing
-        ? "Δηλώσατε ότι δεν θα έρθετε."
-        : "Δηλώσατε συμμετοχή στην εκδήλωση!",
-      "success"
-    );
-  } catch (error) {
-    console.error("Error updating attendance:", error);
-    showToast("Σφάλμα κατά την ενημέρωση της συμμετοχής.", "error");
-  }
-};
+  };
 
   // Copy business profile url to clipboard
   const copyLink = (businessId) => {

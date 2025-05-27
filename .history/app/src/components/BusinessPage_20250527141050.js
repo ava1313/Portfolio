@@ -18,6 +18,8 @@ import Navbar from "./Navbar";
 import "./style.css";
 
 
+const [showAllReviews, setShowAllReviews] = useState(false);
+const REVIEWS_LIMIT = 3;
 
 
 function PopupModal({ open, title, message, onClose, onConfirm, confirmText = "OK", cancelText }) {
@@ -88,9 +90,6 @@ function PopupModal({ open, title, message, onClose, onConfirm, confirmText = "O
 }
 
 export default function BusinessPage() {
-  const [showAllReviews, setShowAllReviews] = useState(false);
-const REVIEWS_LIMIT = 3;
-
   const { id } = useParams();
   const navigate = useNavigate();
   const { isLoaded } = useGoogleMaps();
@@ -320,7 +319,7 @@ const REVIEWS_LIMIT = 3;
   const submitReview = async (e) => {
   e.preventDefault();
   if (!auth.currentUser) {
-    showAlert("Προσοχή", "Πρέπει να είστε συνδεδεμένος για να αφήσετε σχόλιο.");
+    showAlert("Προσοχή", "Πρέπει να είστε συνδεδεμένος για να αφήσετε κριτική.");
     return;
   }
   if (!newReview.comment.trim()) {
@@ -365,7 +364,7 @@ const REVIEWS_LIMIT = 3;
     });
     setReviews(fetchedReviews);
   } catch (error) {
-    showAlert("Σφάλμα", "Σφάλμα κατά την αποστολή του σχολίου.");
+    showAlert("Σφάλμα", "Σφάλμα κατά την αποστολή της κριτικής.");
     console.error("Error submitting review:", error);
   }
   setSubmittingReview(false);
@@ -711,7 +710,7 @@ const REVIEWS_LIMIT = 3;
               gap: 12,
             }}
           >
-            <h3 style={{ fontWeight: 700, fontSize: 22 }}>Αφήστε Σχόλιο</h3>
+            <h3 style={{ fontWeight: 700, fontSize: 22 }}>Αφήστε Κριτική</h3>
 
             <label>
               Rating:
@@ -751,7 +750,7 @@ const REVIEWS_LIMIT = 3;
                   width: "100%",
                   boxSizing: "border-box",
                 }}
-                placeholder="Γράψτε το σχόλιο σας εδώ..."
+                placeholder="Γράψτε την κριτική σας εδώ..."
                 required
               />
             </label>
@@ -779,7 +778,7 @@ const REVIEWS_LIMIT = 3;
                 if (!submittingReview) e.currentTarget.style.backgroundColor = "#191919";
               }}
             >
-              {submittingReview ? "Αποστολή..." : "Υποβολή Σχολίου"}
+              {submittingReview ? "Αποστολή..." : "Υποβολή Κριτικής"}
             </button>
           </form>
         )}
@@ -796,7 +795,7 @@ const REVIEWS_LIMIT = 3;
     }}
   >
     <h3 style={{ marginBottom: 16, fontWeight: 700, fontSize: 22 }}>
-      Σχόλια Χρηστών
+      Κριτικές Χρηστών
     </h3>
     {(showAllReviews ? reviews : reviews.slice(0, REVIEWS_LIMIT)).map((review) => (
       <div

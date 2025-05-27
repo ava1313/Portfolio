@@ -177,21 +177,23 @@ export default function EventsPage() {
       attendees: isGoing ? arrayRemove(user.uid) : arrayUnion(user.uid),
     });
 
-    // Φέρε το username του χρήστη
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-    let username = user.uid;
-    if (userDoc.exists() && userDoc.data().profile && userDoc.data().profile.username) {
-      username = userDoc.data().profile.username;
+    // ----- ΕΔΩ προσθέτεις το notification αν δηλώνει "Θα έρθω" -----
+    if (!isGoing) {
+      // Φέρε το username
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      let username = user.uid;
+      if (userDoc.exists() && userDoc.data().profile && userDoc.data().profile.username) {
+        username = userDoc.data().profile.username;
+      }
+      // Πρόσθεσε notification
+      await addDoc(collection(db, "users", evt.businessId, "notifications"), {
+        type: "going",
+        userId: user.uid,
+        username,
+        timestamp: new Date(), // ή serverTimestamp() αν δουλεύει με rules
+        read: false,
+      });
     }
-
-    // Στείλε notification και για τα δύο (θα έρθει, δεν θα έρθει)
-    await addDoc(collection(db, "users", evt.businessId, "notifications"), {
-      type: isGoing ? "not-going" : "going", // <== ανάλογα
-      userId: user.uid,
-      username,
-      timestamp: new Date(), // ή serverTimestamp()
-      read: false,
-    });
 
     setEvents((es) =>
       es.map((e) =>
@@ -216,6 +218,7 @@ export default function EventsPage() {
     showToast("Σφάλμα κατά την ενημέρωση της συμμετοχής.", "error");
   }
 };
+
 
   // Copy business profile url to clipboard
   const copyLink = (businessId) => {
