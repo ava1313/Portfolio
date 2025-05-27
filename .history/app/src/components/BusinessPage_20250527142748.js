@@ -320,7 +320,7 @@ const REVIEWS_LIMIT = 3;
   const submitReview = async (e) => {
   e.preventDefault();
   if (!auth.currentUser) {
-    showAlert("Προσοχή", "Πρέπει να είστε συνδεδεμένος για να αφήσετε κριτική.");
+    showAlert("Προσοχή", "Πρέπει να είστε συνδεδεμένος για να αφήσετε σχόλιο.");
     return;
   }
   if (!newReview.comment.trim()) {
@@ -329,21 +329,32 @@ const REVIEWS_LIMIT = 3;
   }
   setSubmittingReview(true);
   try {
-    // Fetch username from Firestore
-    const userRef = doc(db, "users", auth.currentUser.uid);
-    const userSnap = await getDoc(userRef);
-    let userName = "Χρήστης";
-    if (userSnap.exists()) {
-      userName = userSnap.data()?.profile?.username || "Χρήστης";
-    }
     const reviewsCol = collection(db, "users", id, "reviews");
+    // Βρες username ή χρήση uid
+    let username = auth.currentUser.uid;
+    const userRef = doc(db, "users", auth.currentUser.uid);
+    const userDoc = await getDoc(userRef);
+    if (userDoc.exists() && userDoc.data().profile && userDoc.data().profile.username) {
+      username = userDoc.data().profile.username;
+    }
+    // Πρόσθεσε κριτική
     await addDoc(reviewsCol, {
       userId: auth.currentUser.uid,
-      userName: userName,
+      userName: auth.currentUser.displayName || username || "Anonymous",
       rating: Number(newReview.rating),
       comment: newReview.comment.trim(),
       timestamp: new Date(),
     });
+
+    // Ειδοποίηση review
+    await addDoc(collection(db, "users", id, "notifications"), {
+      type: "review",
+      userId: auth.currentUser.uid,
+      username,
+      timestamp: new Date(),
+      read: false,
+    });
+
     setNewReview({ rating: 5, comment: "" });
     // Refresh reviews
     const q = query(reviewsCol, orderBy("timestamp", "desc"));
@@ -354,12 +365,11 @@ const REVIEWS_LIMIT = 3;
     });
     setReviews(fetchedReviews);
   } catch (error) {
-    showAlert("Σφάλμα", "Σφάλμα κατά την αποστολή της κριτικής.");
+    showAlert("Σφάλμα", "Σφάλμα κατά την αποστολή του σχολίου.");
     console.error("Error submitting review:", error);
   }
   setSubmittingReview(false);
 };
-
 
 
   if (loading)

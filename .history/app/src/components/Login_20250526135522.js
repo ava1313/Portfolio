@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { auth, provider, db } from "../firebase";
-import { signInWithPopup, onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { signInWithPopup } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import './Login.css';
 
 function Modal({ open, message, onClose }) {
@@ -34,25 +34,10 @@ export default function Login() {
   const location = useLocation();
   const [modal, setModal] = useState({ open: false, message: "" });
 
-  // Auto-redirect if logged in
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-        const redirectPath = location.state?.from?.pathname || "/mainpage";
-        if (!userSnap.exists() || userSnap.data().role == null) {
-          navigate("/profile-builder", { replace: true });
-        } else {
-          navigate(redirectPath, { replace: true });
-        }
-      }
-    });
-    return () => unsub();
-    // eslint-disable-next-line
-  }, []);
+  const showModal = (msg, cb) => {
+    setModal({ open: true, message: msg, cb });
+  };
 
-  const showModal = (msg, cb) => setModal({ open: true, message: msg, cb });
   const closeModal = () => {
     setModal({ open: false, message: "" });
     if (modal.cb) modal.cb();
@@ -65,30 +50,17 @@ export default function Login() {
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
 
-      // Save minimal user info if new user
-      if (!userSnap.exists()) {
-        await setDoc(userRef, {
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          createdAt: new Date(),
-          role: null, // force profile completion
-        });
-        showModal("Συμπληρώστε το προφίλ σας.", () =>
-          navigate("/profile-builder", { replace: true })
-        );
-      } else if (userSnap.data().role == null) {
-        showModal("Συμπληρώστε το προφίλ σας.", () =>
-          navigate("/profile-builder", { replace: true })
-        );
+      // Where should we redirect after login?
+      const redirectPath = location.state?.from?.pathname || "/mainpage";
+
+      if (!userSnap.exists() || userSnap.data().role === null) {
+        showModal("Please complete your profile.", () => navigate("/profile-builder", { replace: true }));
       } else {
-        showModal(`Καλώς ήρθατε ξανά, ${userSnap.data().displayName || user.displayName}`, () =>
-          navigate(location.state?.from?.pathname || "/mainpage", { replace: true })
-        );
+        showModal(`Welcome back, ${user.displayName}`, () => navigate(redirectPath, { replace: true }));
       }
     } catch (error) {
       console.error(error);
-      showModal("Η σύνδεση απέτυχε");
+      showModal("Login failed");
     }
   };
 
@@ -111,7 +83,7 @@ export default function Login() {
           alt="Google logo"
           style={{ marginRight: 8 }}
         />
-        Σύνδεση με Google
+        Sign in with Google
       </button>
       <Modal open={modal.open} message={modal.message} onClose={closeModal} />
     </div>
